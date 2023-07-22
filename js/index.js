@@ -21,7 +21,10 @@ window.addEventListener('message', function (event) {
 
             //改變表格內容
             let word = this.document.getElementById(id);
-            if (schedule.get(id) > 1) word.innerHTML += "<br>"
+            if (schedule.get(id) > 1) {
+                word.innerHTML += "<br>"
+                word.style.backgroundColor = "red";
+            }
 
             let buttonID = id + "." + courseID;
             deleteID.push(buttonID);
@@ -100,4 +103,5 @@ function deleteCourse(remCourseID){
     }else console.log("左半表格位置獲取失敗")
     
     allCourse.delete(remCourseID);
+    schedule.set(remCourseID, schedule.get(remCourseID)-1);
 }
