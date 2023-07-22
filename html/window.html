@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="container">
+
+    <!-- 左方輸入框 -->
+    <div class="left">
+        課程名稱<br><input id="courseName" type="text"><br><br>
+        開課老師<br><input id="teacher" type="text"><br><br>
+        學分數  <br><input id="credit" type="text">
+        <hr>
+        
+        <button onclick="addCourse()">新增</button>
+        <button onclick="closePage()">取消</button>
+    </div>
+    
+    <div class="right small">
+        <table class="windowTableChoice">
+            <tr>
+                <th></th>
+                <th>星期一</th>
+                <th>星期二</th>
+                <th>星期三</th>
+                <th>星期四</th>
+                <th>星期五</th>
+                <th>星期六</th>
+                <th>星期天</th>
+            </tr>
+            <tr>
+                <th>0810-0900</th>
+                <td><button id="1 1" type="button" onclick="choice('1 1')"></button></td>
+                <td><button id="1 2" type="button" onclick="choice('1 2')"></button></td>
+                <td><button id="1 3" type="button" onclick="choice('1 3')"></button></td>
+                <td><button id="1 4" type="button" onclick="choice('1 4')"></button></td>
+                <td><button id="1 5" type="button" onclick="choice('1 5')"></button></td>
+                <td><button id="1 6" type="button" onclick="choice('1 6')"></button></td>
+                <td><button id="1 7" type="button" onclick="choice('1 7')"></button></td>        
+            </tr>
+            <tr>
+                <th>0910-1000</th>
+                <td><button id="2 1" type="button" onclick="choice('2 1')"></button></td>
+                <td><button id="2 2" type="button" onclick="choice('2 2')"></button></td>
+                <td><button id="2 3" type="button" onclick="choice('2 3')"></button></td>
+                <td><button id="2 4" type="button" onclick="choice('2 4')"></button></td>
+                <td><button id="2 5" type="button" onclick="choice('2 5')"></button></td>
+                <td><button id="2 6" type="button" onclick="choice('2 6')"></button></td>
+                <td><button id="2 7" type="button" onclick="c3oice('2 7')"></button></td>      
+            </tr>
+            <tr>
+                <th>1010-1100</th>
+                <td><button id="3 1" type="button" onclick="choice('3 1')"></button></td>
+                <td><button id="3 2" type="button" onclick="choice('3 2')"></button></td>
+                <td><button id="3 3" type="button" onclick="choice('3 3')"></button></td>
+                <td><button id="3 4" type="button" onclick="choice('3 4')"></button></td>
+                <td><button id="3 5" type="button" onclick="choice('3 5')"></button></td>
+                <td><button id="3 6" type="button" onclick="choice('3 6')"></button></td>
+                <td><button id="3 7" type="button" onclick="choice('3 7')"></button></td>     
+            </tr>
+            <tr>
+                <th>1110-1200</th>
+                <td><button id="4 1" type="button" onclick="choice('4 1')"></button></td>
+                <td><button id="4 2" type="button" onclick="choice('4 2')"></button></td>
+                <td><button id="4 3" type="button" onclick="choice('4 3')"></button></td>
+                <td><button id="4 4" type="button" onclick="choice('4 4')"></button></td>
+                <td><button id="4 5" type="button" onclick="choice('4 5')"></button></td>
+                <td><button id="4 6" type="button" onclick="choice('4 6')"></button></td>
+                <td><button id="4 7" type="button" onclick="choice('4 7')"></button></td>     
+            </tr>
+            <tr>
+                <th>中午1200-1300</th>
+                <td><button id="5 1" type="button" onclick="choice('5 1')"></button></td>
+                <td><button id="5 2" type="button" onclick="choice('5 2')"></button></td>
+                <td><button id="5 3" type="button" onclick="choice('5 3')"></button></td>
+                <td><button id="5 4" type="button" onclick="choice('5 4')"></button></td>
+                <td><button id="5 5" type="button" onclick="choice('5 5')"></button></td>
+                <td><button id="5 6" type="button" onclick="choice('5 6')"></button></td>
+                <td><button id="5 7" type="button" onclick="choice('5 7')"></button></td>    
+            </tr>
+            <tr>
+                <th>1310-1400</th>
+                <td><button id="6 1" type="button" onclick="choice('6 1')"></button></td>
+                <td><button id="6 2" type="button" onclick="choice('6 2')"></button></td>
+                <td><button id="6 3" type="button" onclick="choice('6 3')"></button></td>
+                <td><button id="6 4" type="button" onclick="choice('6 4')"></button></td>
+                <td><button id="6 5" type="button" onclick="choice('6 5')"></button></td>
+                <td><button id="6 6" type="button" onclick="choice('6 6')"></button></td>
+                <td><button id="6 7" type="button" onclick="choice('6 7')"></button></td> 
+            </tr>
+            <tr>
+                <th>1410-1500</th>
+                <td><button id="7 1" type="button" onclick="choice('7 1')"></button></td>
+                <td><button id="7 2" type="button" onclick="choice('7 2')"></button></td>
+                <td><button id="7 3" type="button" onclick="choice('7 3')"></button></td>
+                <td><button id="7 4" type="button" onclick="choice('7 4')"></button></td>
+                <td><button id="7 5" type="button" onclick="choice('7 5')"></button></td>
+                <td><button id="7 6" type="button" onclick="choice('7 6')"></button></td>
+                <td><button id="7 7" type="button" onclick="choice('7 7')"></button></td>   
+            </tr>
+            <tr>
+                <th>1510-1600</th>
+                <td><button id="8 1" type="button" onclick="choice('8 1')"></button></td>
+                <td><button id="8 2" type="button" onclick="choice('8 2')"></button></td>
+                <td><button id="8 3" type="button" onclick="choice('8 3')"></button></td>
+                <td><button id="8 4" type="button" onclick="choice('8 4')"></button></td>
+                <td><button id="8 5" type="button" onclick="choice('8 5')"></button></td>
+                <td><button id="8 6" type="button" onclick="choice('8 6')"></button></td>
+                <td><button id="8 7" type="button" onclick="choice('8 7')"></button></td>      
+            </tr>
+            <tr>
+                <th>1610-1700</th>
+                <td><button id="9 1" type="button" onclick="choice('9 1')"></button></td>
+                <td><button id="9 2" type="button" onclick="choice('9 2')"></button></td>
+                <td><button id="9 3" type="button" onclick="choice('9 3')"></button></td>
+                <td><button id="9 4" type="button" onclick="choice('9 4')"></button></td>
+                <td><button id="9 5" type="button" onclick="choice('9 5')"></button></td>
+                <td><button id="9 6" type="button" onclick="choice('9 6')"></button></td>
+                <td><button id="9 7" type="button" onclick="choice('9 7')"></button></td>      
+            </tr>
+        </table>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/window.js"></script>
+</body>
+</html>

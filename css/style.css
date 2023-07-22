@@ -1,0 +1,65 @@
+table {
+    border-collapse: collapse;
+    width: 700;
+    text-align: center;
+    margin: 20px 0px 0px 20px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.container {
+    display: flex;
+}
+
+.left {
+    flex: 2;
+}
+
+.right {
+    flex: 1;
+}
+
+input[type="text"] {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.small {
+    font-size: 10px;
+}
+
+.windowTableChoice button,
+.indexTablebutton button {
+    margin: 0px;
+    width: 40px;
+    height: 25px;
+    background-color: #f2f2f2;
+}
+
+.windowTableChoice button:hover {
+    margin: 0px;
+    width: 40px;
+    height: 25px;
+    background-color: #b8b8b8;
+}
+
+.windowTableChoice td {
+    padding: 0;
+}
+
+#button th,
+#button td {
+    width: 100px;
+    margin: 0px;
+}
+
+#button button {
+    padding: 0px;
+    margin: 0px;
+    width: 90px;
+}
