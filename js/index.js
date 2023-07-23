@@ -99,9 +99,14 @@ function deleteCourse(remCourseID){
             container = document.getElementById(tmp[0]);
             rem = document.getElementById(id);
             container.removeChild(rem);
+
+            schedule.set(tmp[0], schedule.get(tmp[0])-1);
+            if(schedule.get(tmp[0]) <= 1){
+                container.style.backgroundColor = "white";
+            }
         }
     }else console.log("左半表格位置獲取失敗")
     
     allCourse.delete(remCourseID);
-    schedule.set(remCourseID, schedule.get(remCourseID)-1);
+    
 }
