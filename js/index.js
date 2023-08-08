@@ -1,16 +1,17 @@
-// row = parseInt(prompt("請輸入節數(列): ")) + 1;
-// col = parseInt(prompt("請輸入天數(行): ")) + 1;
-
-let row = 11;
-let col = 7;
+let row = defRow;
+let col = defCol;
 
 // ========== 主頁面部分 ==========
 
-
 // ========== 左半表格 ==========
-// 獲取index 左半部分的位置
-function InitialView(){
-    let indexLeftDiv = document.getElementById("indexLeftDiv");
+
+// f函式 介面初始化 可自訂表格大小
+function InitialView() {
+    //debug
+    console.log("========== 初始化: row=" + String(row) + " col=" + String(col) + " ==========");
+
+    // 獲取index 左半部分的位置
+    let LContent = document.getElementById("LContent");
 
     //處理左半課表
     let tableString = "<table id = 'userTableView'>";
@@ -28,12 +29,13 @@ function InitialView(){
             }
             // 處理節數標題(側)的部分
             else if (j == 0 && i != 0) {
-                tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + colTitle1[i] + ' ' + colTitle2[i] + "'></td>";
+                tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + colTitle[i] + "'></td>";
             }
             //處理其他地方
             else {
-                // 給id
-                tableString = tableString + "<td id='" + String(i) + '-' + String(j) + "'></td>";
+                // 給id 製造pos座標
+                let pos = String(i) + '-' + String(j);
+                tableString = tableString + "<td id='" + pos + "'></td>";
             }
         }
         tableString += "</tr>";
@@ -41,45 +43,72 @@ function InitialView(){
     tableString += "</table>";
 
     //將左半部分插入表格
-    indexLeftDiv.innerHTML += tableString;
+    LContent.innerHTML += tableString;
 }
 
-InitialView();// 初始化
-
-// let rowTitleText = document.getElementsByClassName("rowTitleText");
-// let colTitleText = document.getElementsByClassName("colTitleText");
+InitialView();// 介面 初始化
 
 // ========== 右半表格 ==========
 
-// 暫時性ID用於追蹤 課程物件 位置
-let tempID = 0;
+
+// _______________________________ <ID資料管理 _______________________________
+// 課程ID (不重複)
+let courseID = 0;
+// 透過課程ID可獲得課程基礎資料
+
+// courseID: 為一部重複令牌，從數字0每給一次就加1
+// listIdName為ID前綴可在data.js修改
+function getListID(courseID) {
+    return listIdName + String(courseID);
+}
+
+// posID: 為插入button元件的位置 ex: '1-1'
+// tbBtnIdName為ID前綴可在data.js修改
+function getTableBtnID(posID, courseID) {
+    return tbBtnIdName + String(posID) + '.' + String(courseID);
+}
+
+//透過courseID獲取posID 
+function getposIDList(courseID) {
+    //courseListRow 指的是courseListView的其中一列
+    let courseListRow = document.getElementById(getListID(courseID));
+    // courseTime是根據class Course設計
+    let posIDList = courseListRow.getElementsByClassName("courseTime")[0].textContent.split(' ');
+    // contentText可以取出裡面的內容，通常是不能變動的才能用contentText
+    return posIDList;
+}
+
+// _______________________________ ID資料管理> _______________________________
 
 
+// _______________________________ <刪除與隱藏 _______________________________
 // f函式確認刪除後的資料
 function schduleConfirm(tmpid) {
 
 }
-function hidden(id) {
-    console.log("hidden");
-    let posList = tempIDbindbtn.get(id);
+function hidden(courseID) {
+    let posIDList = getposIDList(courseID);
 
-    for (let i of posList) {
-        btnPosID = String(i + "." + id);
+    for (let posID of posIDList) {
+        tableBtnID = getTableBtnID(posID, courseID);
 
         // 移除schduleChecked
-        let schdule = schduleChecked.get(i);
+        let schdule = schduleChecked.get(posID);
         schdule.size -= 1;
 
         if (schdule.size == 1) {
-            document.getElementById(i).style.background = "white";
-            for (let tmpid of schduleChecked.get(i).tempIDs) {
-                document.getElementById("LIST" + tmpid).style.color = "black";
+            // 還原背景顏色
+            document.getElementById(posID).style.background = "white";
+
+            // 變更字體顏色: 綠色代表隱藏
+            for (let course_ID of schduleChecked.get(posID).tempIDs) {
+                document.getElementById(getListID(course_ID)).style.color = "black";
             }
         }
 
-        let rmv = schdule.tempIDs.indexOf(id);
+        let rmv = schdule.tempIDs.indexOf(courseID);
         schdule.tempIDs.splice(rmv, 1);
-        document.getElementById(btnPosID).remove();
+        document.getElementById(tableBtnID).remove();
     }
 
 }
@@ -169,6 +198,9 @@ function removeCourse(id) {
 
 }
 
+// _______________________________ 刪除與隱藏> _______________________________
+
+
 // ========== 下方控制 ==========
 
 // 插入表格 喚出設定表單
@@ -215,15 +247,15 @@ function makeCourseListView(data) {
     Time = Time.slice(0, -1);
 
     let courseListView = document.getElementById("courseListView");
-    let courseListStr = "<tr id='LIST" + String(tempID) + "'>"
+    let courseListStr = "<tr id='LIST" + String(courseID) + "'>"
         + "<td class='courseName'>" + data.name + "</td>"
         + "<td class='courseCredit'>" + data.credit + "</td>"
         + "<td class='courseTeacher'>" + data.teacher + "</td>"
         + "<td class='courseCode'>" + data.code + "</td>"
 
         // (courseListViewButton)右表格按鈕處理 隱藏、刪除
-        + "<td><button onclick='" + "removeCourse(" + String(tempID) + ")" + "'>刪除</button>"
-        + "<hr><button id='CON" + String(tempID) + "' onclick='hidding(" + String(tempID) + ")'>隱藏</button></td>"
+        + "<td><button onclick='" + "removeCourse(" + String(courseID) + ")" + "'>刪除</button>"
+        + "<hr><button id='CON" + String(courseID) + "' onclick='hidding(" + String(courseID) + ")'>隱藏</button></td>"
         + "<td class='courseTime'>" + Time + "</td>"
         + "</tr>"
     courseListView.innerHTML += courseListStr;
@@ -239,7 +271,7 @@ function makeUserTableView(data) {
         //設定BTN位置
         console.log(id);
         let tableTd = document.getElementById(id);
-        let newID = id + "." + tempID;
+        let newID = id + "." + courseID;
         tableTd.innerHTML += "<button id='" + String(newID) + "'>" + data.name + "</button>";
 
 
@@ -248,7 +280,7 @@ function makeUserTableView(data) {
             //處理schduleChecked資料
             let schdule = schduleChecked.get(id);
             schdule.size += 1;
-            schdule.tempIDs.push(tempID);
+            schdule.tempIDs.push(courseID);
 
             if (schdule.size > 1) {
                 //處理table背景
@@ -264,19 +296,19 @@ function makeUserTableView(data) {
             }
 
         } else {
-            schduleChecked.set(id, new Schdule(1, [tempID]));
+            schduleChecked.set(id, new Schdule(1, [courseID]));
         }
 
         // tempid找pos
-        if (tempIDbindbtn.has(tempID)) {
-            let bind = tempIDbindbtn.get(tempID);
+        if (tempIDbindbtn.has(courseID)) {
+            let bind = tempIDbindbtn.get(courseID);
             bind.push(id);
         } else {
-            tempIDbindbtn.set(tempID, [id]);
+            tempIDbindbtn.set(courseID, [id]);
         }
 
     }
-    tempID++;
+    courseID++;
 }
 
 
