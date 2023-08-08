@@ -1,48 +1,50 @@
-// row = parseInt(prompt("請輸入節數(列): "))+1;
-// col = parseInt(prompt("請輸入天數(行): "))+1;
+// row = parseInt(prompt("請輸入節數(列): ")) + 1;
+// col = parseInt(prompt("請輸入天數(行): ")) + 1;
 
 let row = 11;
-let col = 5;
+let col = 7;
 
 // ========== 主頁面部分 ==========
 
 
 // ========== 左半表格 ==========
 // 獲取index 左半部分的位置
-let indexLeftDiv = document.getElementById("indexLeftDiv");
+function InitialView(){
+    let indexLeftDiv = document.getElementById("indexLeftDiv");
 
+    //處理左半課表
+    let tableString = "<table id = 'userTableView'>";
+    for (let i = 0; i < row; i++) {
+        tableString += "<tr>";
 
-//處理左半課表
-let tableString = "<table id = 'userTableView'>";
-for (let i = 0; i < row; i++) {
-    tableString += "<tr>";
-
-    for (let j = 0; j < col; j++) {
-        // 左上空格
-        if (i == 0 && j == 0) {
-            tableString = tableString + "<th>" + "<input class='colTitleText' type='text'></th>";
+        for (let j = 0; j < col; j++) {
+            // 左上空格
+            if (i == 0 && j == 0) {
+                tableString = tableString + "<th>" + "<input class='colTitleText' type='text'></th>";
+            }
+            //處理表格日期標題的部分
+            else if (i == 0) {//第一格要空格，放節數
+                tableString = tableString + "<th>" + "<input class='rowTitleText' type='text' value='" + rowTitle[j] + "'></th>";
+            }
+            // 處理節數標題(側)的部分
+            else if (j == 0 && i != 0) {
+                tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + colTitle1[i] + ' ' + colTitle2[i] + "'></td>";
+            }
+            //處理其他地方
+            else {
+                // 給id
+                tableString = tableString + "<td id='" + String(i) + '-' + String(j) + "'></td>";
+            }
         }
-        //處理表格日期標題的部分
-        else if (i == 0) {//第一格要空格，放節數
-            tableString = tableString + "<th>" + "<input class='rowTitleText' type='text' value='" + rowTitle[j] + "'></th>";
-        }
-        // 處理節數標題(側)的部分
-        else if (j == 0 && i != 0) {
-            tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + colTitle1[i] + ' ' + colTitle2[i] + "'></td>";
-        }
-        //處理其他地方
-        else {
-            // 給id
-            tableString = tableString + "<td id='" + String(i) + '-' + String(j) + "'></td>";
-        }
+        tableString += "</tr>";
     }
-    tableString += "</tr>";
+    tableString += "</table>";
+
+    //將左半部分插入表格
+    indexLeftDiv.innerHTML += tableString;
 }
-tableString += "</table>";
 
-//將左半部分插入表格
-indexLeftDiv.innerHTML += tableString;
-
+InitialView();// 初始化
 
 // let rowTitleText = document.getElementsByClassName("rowTitleText");
 // let colTitleText = document.getElementsByClassName("colTitleText");
@@ -70,14 +72,14 @@ function hidden(id) {
 
         if (schdule.size == 1) {
             document.getElementById(i).style.background = "white";
-            for(let tmpid of schduleChecked.get(i).tempIDs){
+            for (let tmpid of schduleChecked.get(i).tempIDs) {
                 document.getElementById("LIST" + tmpid).style.color = "black";
             }
         }
 
         let rmv = schdule.tempIDs.indexOf(id);
         schdule.tempIDs.splice(rmv, 1);
-        document.getElementById(btnPosID).remove(); 
+        document.getElementById(btnPosID).remove();
     }
 
 }
@@ -292,6 +294,11 @@ window.addEventListener("message", function (event) {
 
         //處理左邊tableView的新增 與 處理衝堂
         makeUserTableView(data);
+    } else {
+        row = data[0];
+        col = data[1];
+        document.getElementById("userTableView").remove();
+        InitialView();
     }
 });
 
@@ -351,3 +358,21 @@ fileInput.addEventListener('change', function (event) {
     reader.readAsText(file);
 });
 
+function exportCode() {
+    let textView = document.getElementById("code");
+
+    if (textView) {
+        let strs = "";
+        for (let str of document.getElementsByClassName("courseCode")) {
+            console.log(strs);
+            strs += (str.textContent + '\n');
+        }
+
+        textView.value = strs;
+    }
+
+}
+
+function RCsetting() {
+    let rc = window.open("./html/RC.html", "_blank", "width=500,height=500, top=100, left=500");
+}

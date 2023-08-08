@@ -27,9 +27,19 @@
     <div id="controlView">
         <hr>
         <button id="addCourse" onclick="insertCourse()">新增課程</button>
+        <span>&nbsp;&nbsp;</span>
         <button id="export" onclick="exportJson()">導出Json</button>
+        <span>&nbsp;&nbsp;</span>
+        <input type="file" id="fileInput">
+        <span>&nbsp;&nbsp;</span>
+        <button id="exportCode" onclick="exportCode()">導出課程代碼</button>
+        <textarea name="" id="code" cols="30" rows="10"></textarea>
+        <span>&nbsp;&nbsp;</span>
+        <button id="RCsetting" onclick="RCsetting()">設定表格節數與天數</button>
+        <span>&nbsp;&nbsp;</span>
+        <p>調整表格節數與天數前請保存</p>
     </div>
-    <input type="file" id="fileInput">
+    
 
 
     <script src="js/data.js"></script>
