@@ -1,147 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-tw">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>課表</title>
-    <link rel="stylesheet" href="css/style.css">
-   
+    <title>課表選擇</title>
+    <link rel="stylesheet" href="css/index.css">
 </head>
 
-<body class="container">
-    <!-- 顯示 -->
-    <div class="left">
-        <table class="indexTablebutton small" id="button">
-            <tr>
-                <th></th>
-                <th>星期一</th>
-                <th>星期二</th>
-                <th>星期三</th>
-                <th>星期四</th>
-                <th>星期五</th>
-                <th>星期六</th>
-                <th>星期天</th>
-            </tr>
-            <tr>
-                <th>1</th>
-                <td id="1-1"></td>
-                <td id="1-2"></td>
-                <td id="1-3"></td>
-                <td id="1-4"></td>
-                <td id="1-5"></td>
-                <td id="1-6"></td>
-                <td id="1-7"></td>
-            </tr>
-            <tr>
-                <th>2</th>
-                <td id="2-1"></td>
-                <td id="2-2"></td>
-                <td id="2-3"></td>
-                <td id="2-4"></td>
-                <td id="2-5"></td>
-                <td id="2-6"></td>
-                <td id="2-7"></td>
-            </tr>
-            <tr>
-                <th>3</th>
-                <td id="3-1"></td>
-                <td id="3-2"></td>
-                <td id="3-3"></td>
-                <td id="3-4"></td>
-                <td id="3-5"></td>
-                <td id="3-6"></td>
-                <td id="3-7"></td>
-            </tr>
-            <tr>
-                <th>4</th>
-                <td id="4-1"></td>
-                <td id="4-2"></td>
-                <td id="4-3"></td>
-                <td id="4-4"></td>
-                <td id="4-5"></td>
-                <td id="4-6"></td>
-                <td id="4-7"></td>
-            </tr>
-            <tr>
-                <th>中午</th>
-                <td id="noon-1"></td>
-                <td id="noon-2"></td>
-                <td id="noon-3"></td>
-                <td id="noon-4"></td>
-                <td id="noon-5"></td>
-                <td id="noon-6"></td>
-                <td id="noon-7"></td>
-            </tr>
-            <tr>
-                <th>5</th>
-                <td id="5-1"></td>
-                <td id="5-2"></td>
-                <td id="5-3"></td>
-                <td id="5-4"></td>
-                <td id="5-5"></td>
-                <td id="5-6"></td>
-                <td id="5-7"></td>
-            </tr>
-            <tr>
-                <th>6</th>
-                <td id="6-1"></td>
-                <td id="6-2"></td>
-                <td id="6-3"></td>
-                <td id="6-4"></td>
-                <td id="6-5"></td>
-                <td id="6-6"></td>
-                <td id="6-7"></td>
-            </tr>
-            <tr>
-                <th>7</th>
-                <td id="7-1"></td>
-                <td id="7-2"></td>
-                <td id="7-3"></td>
-                <td id="7-4"></td>
-                <td id="7-5"></td>
-                <td id="7-6"></td>
-                <td id="7-7"></td>
-            </tr>
-            <tr>
-                <th>8</th>
-                <td id="8-1"></td>
-                <td id="8-2"></td>
-                <td id="8-3"></td>
-                <td id="8-4"></td>
-                <td id="8-5"></td>
-                <td id="8-6"></td>
-                <td id="8-7"></td>
-            </tr>
-            <tr>
-                <th>9</th>
-                <td id="9-1"></td>
-                <td id="9-2"></td>
-                <td id="9-3"></td>
-                <td id="9-4"></td>
-                <td id="9-5"></td>
-                <td id="9-6"></td>
-                <td id="9-7"></td>
-            </tr>
-        </table>
-        <!-- 使用者輸入 -->
-        <div>
-            <br>
-            <hr>
-            <button onclick="insertCourse()">插入課程</button>
+<body>
+    <div id="mainContentView">
+        <div id="indexLeftDiv"></div>
+        <div id="indexRightDiv">
+            <table id="courseListView">
+                <tr>
+                    <th>課程名稱</th>
+                    <th>學分數</th>
+                    <th>教師</th>
+                    <th>課程代碼</th>
+                    <th>控制</th>
+                    <th>時段</th>
+                </tr>
+            </table>
         </div>
     </div>
-
-    <div class="right">
-        <table id="rtableContainer">
-            <tr>
-                <th>課程名稱</th>
-                <th>授課教師</th>
-                <th>學分數</th>
-                <th>選項</th>
-            </tr>
-        </table>
+    <div id="controlView">
+        <hr>
+        <button id="addCourse" onclick="insertCourse()">新增課程</button>
+        <button id="export" onclick="exportJson()">導出Json</button>
     </div>
+    <input type="file" id="fileInput">
+
 
     <script src="js/data.js"></script>
     <script src="js/index.js"></script>

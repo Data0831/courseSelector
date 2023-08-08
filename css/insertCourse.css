@@ -1,0 +1,63 @@
+/* 主體顯示一左一右 */
+#insertCourseMainContentView {
+    display: flex;
+}
+
+/* 左半部分 */
+#insertCourseLeftDiv {
+    font-family: "Consolas";
+    font-weight: bold;
+    width: 200px;
+}
+
+/* 右半部分 */
+#insertCourseRightDiv {
+    width: 80%;
+}
+
+table {
+    border-collapse: collapse;
+    /* 決定相鄰的border是否要合併:(th、td) */
+    text-align: center;
+}
+
+/* 對表格增加邊框 */
+#chooseTable th,
+#chooseTable td {
+    font-family: "Consolas";
+    font-weight: bold;
+    border: 1px solid black;
+    /* padding: 5px; */
+    height: 40px;
+    width: 70px;
+}
+
+/* 表格標題 */
+#chooseTable th {
+    white-space: pre;
+    /* 顯示多行空格 */
+}
+
+/* 表格row標題 */
+/* .rowTitleText {
+} */
+
+/* 表格col標題 */
+.colTitleText {
+    text-align: left;
+    /* 至左 */
+    width: 140px;
+}
+
+/* 選擇表格按鈕 */
+#insertCourseRightDiv button {
+    background-color: #f2f2f2;
+    border: 2px black solid;
+    margin: 2px 3px;
+    width: 90%;
+    height: 30px;
+}
+
+#insertCourseRightDiv button:hover {
+    background-color: #b8b8b8;
+}
