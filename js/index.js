@@ -1,5 +1,5 @@
-let row = defRow;
-let col = defCol;
+let row = DEF_ROW;
+let col = DEF_COL;
 
 // ========== 主頁面部分 ==========
 
@@ -25,11 +25,11 @@ function InitialView() {
             }
             //處理表格日期標題的部分
             else if (i == 0) {//第一格要空格，放節數
-                tableString = tableString + "<th>" + "<input class='rowTitleText' type='text' value='" + rowTitle[j] + "'></th>";
+                tableString = tableString + "<th>" + "<input class='rowTitleText' type='text' value='" + ROW_TITLE[j] + "'></th>";
             }
             // 處理節數標題(側)的部分
             else if (j == 0 && i != 0) {
-                tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + colTitle[i] + "'></td>";
+                tableString = tableString + "<td>" + "<input class='colTitleText' type='text' value='" + COL_TITLE[i] + "'></td>";
             }
             //處理其他地方
             else {
@@ -59,13 +59,13 @@ let courseID = 0;
 // courseID: 為一部重複令牌，從數字0每給一次就加1
 // listIdName為ID前綴可在data.js修改
 function getListID(courseID) {
-    return listIdName + String(courseID);
+    return LIST_ID_NAME + String(courseID);
 }
 
 // posID: 為插入button元件的位置 ex: '1-1'
 // tbBtnIdName為ID前綴可在data.js修改
 function getTableBtnID(posID, courseID) {
-    return tbBtnIdName + String(posID) + '.' + String(courseID);
+    return TB_BTN_ID_NAME + String(posID) + '.' + String(courseID);
 }
 
 //透過courseID獲取posID 
@@ -73,7 +73,7 @@ function getposIDList(courseID) {
     //courseListRow 指的是courseListView的其中一列
     let courseListRow = document.getElementById(getListID(courseID));
     // courseTime是根據class Course設計
-    let posIDList = courseListRow.getElementsByClassName("courseTime")[0].textContent.split(' ');
+    let posIDList = courseListRow.getElementsByClassName(COURSE_CLASS_TIME)[0].textContent.split(' ');
     // contentText可以取出裡面的內容，通常是不能變動的才能用contentText
     return posIDList;
 }
@@ -82,72 +82,78 @@ function getposIDList(courseID) {
 
 
 // _______________________________ <刪除與隱藏 _______________________________
-// f函式確認刪除後的資料
-function schduleConfirm(tmpid) {
 
+// f函式 移除表格課程衝堂資料 控制紅色警告
+function schduleCkRm(posID, courseID) {
+    // schduleChecked 移除 tbBtn課程資料 刪除courseViewRow 衝堂統計
+    let schdule = schduleChecked.get(posID);
+    schdule.size -= 1;
+
+
+    //List中要移除元素之索引
+    let indexRmv = schdule.courseIDList.indexOf(courseID);
+    // splice(索引, 移除元素量);
+    schdule.courseIDList.splice(indexRmv, 1);
+
+    if (schdule.size == 1) {
+        // 還原背景顏色
+        document.getElementById(posID).style.background = "white";
+
+        // 還原字體顏色
+        for (let course_ID of schduleChecked.get(posID).courseIDList) {
+            document.getElementById(getListID(course_ID)).style.color = "black";
+        }
+    }
 }
+
+
 function hidden(courseID) {
+    document.getElementById(getListID(courseID)).style.color = "green";
     let posIDList = getposIDList(courseID);
 
     for (let posID of posIDList) {
-        tableBtnID = getTableBtnID(posID, courseID);
-
-        // 移除schduleChecked
-        let schdule = schduleChecked.get(posID);
-        schdule.size -= 1;
-
-        if (schdule.size == 1) {
-            // 還原背景顏色
-            document.getElementById(posID).style.background = "white";
-
-            // 變更字體顏色: 綠色代表隱藏
-            for (let course_ID of schduleChecked.get(posID).tempIDs) {
-                document.getElementById(getListID(course_ID)).style.color = "black";
-            }
-        }
-
-        let rmv = schdule.tempIDs.indexOf(courseID);
-        schdule.tempIDs.splice(rmv, 1);
+        // 移除表格中課程
+        let tableBtnID = getTableBtnID(posID, courseID);
         document.getElementById(tableBtnID).remove();
+
+        // 檢查有沒有要消除的紅色警告
+        schduleCkRm(posID, courseID);
     }
 
 }
 
-function show(xid) {
-    console.log("show");
+function show(courseID) {
+    let courseListView = document.getElementById(getListID(courseID));
 
-    let courseListView = document.getElementById("LIST" + xid);
-    let courseName = courseListView.getElementsByClassName("courseName");
-    let courseCredit = courseListView.getElementsByClassName("courseCredit");
-    let courseTeacher = courseListView.getElementsByClassName("courseTeacher");
-    let courseCode = courseListView.getElementsByClassName("courseCode");
-    let courseTime = courseListView.getElementsByClassName("courseTime");
-    // console.log(courseCode);
+    let courseNameStr = courseListView.getElementsByClassName(COURSE_CLASS_NAME)[0].textContent;
+    let courseCreditStr = courseListView.getElementsByClassName(COURSE_CLASS_CREDIT)[0].textContent;
+    let courseTeacherStr = courseListView.getElementsByClassName(COURSE_CLASS_TEACHER)[0].textContent;
+    let courseCodeStr = courseListView.getElementsByClassName(COURSE_CLASS_CODE)[0].textContent;
+    let courseTimeList = courseListView.getElementsByClassName(COURSE_CLASS_TIME)[0].textContent.split(' ');
 
-    let course = new Course(courseName[0].textContent, courseCredit[0].textContent, courseTeacher[0].textContent, courseCode[0].textContent, courseTime[0].textContent.split(' '));
+    let course = new Course(courseNameStr, courseCreditStr, courseTeacherStr, courseCodeStr, courseTimeList);
 
-    for (let id of course.time) {
-        //設定BTN位置
-        console.log(id);
-        let tableTd = document.getElementById(id);
-        let newID = id + "." + xid;
-        tableTd.innerHTML += "<button id='" + String(newID) + "'>" + course.name + "</button>";
+    for (let posID of course.time) {
 
+        //獲取td 在裡面放入課程BTN
+        let tableTd = document.getElementById(posID);
+        let tableBtnID = getTableBtnID(posID, courseID);
+        tableTd.innerHTML += "<button id='" + tableBtnID + "'>" + course.name + "</button>";
 
         //設定衝堂資料
-        if (schduleChecked.has(id)) {
+        if (schduleChecked.has(posID)) {
             //處理schduleChecked資料
-            let schdule = schduleChecked.get(id);
+            let schdule = schduleChecked.get(posID);
             schdule.size += 1;
-            schdule.tempIDs.push(xid);
+            schdule.courseIDList.push(courseID);
 
             if (schdule.size > 1) {
                 //處理table背景
-                let tdBcCor = document.getElementById(id);
+                let tdBcCor = document.getElementById(posID);
                 tdBcCor.style.background = "red";
 
                 //處理list背景
-                for (let conflict of schdule.tempIDs) {
+                for (let conflict of schdule.courseIDList) {
                     listID = "LIST" + String(conflict);
                     let listCor = document.getElementById(listID);
                     listCor.style.color = "red";
@@ -155,7 +161,7 @@ function show(xid) {
             }
 
         } else {
-            schduleChecked.set(id, new Schdule(1, [xid]));
+            schduleChecked.set(posID, new Schdule(1, [courseID]));
         }
     }
 
@@ -184,13 +190,13 @@ function removeCourse(id) {
         let schdule = schduleChecked.get(i);
         schdule.size -= 1;
 
-        let rmv = schdule.tempIDs.indexOf(id);
-        schdule.tempIDs.splice(rmv, 1);
+        let rmv = schdule.courseIDList.indexOf(id);
+        schdule.courseIDList.splice(rmv, 1);
         document.getElementById(btnPosID).remove();
 
         if (schdule.size == 1) {
             document.getElementById(i).style.background = "white";
-            document.getElementById("LIST" + schduleChecked.get(i).tempIDs[0]).style.color = "black";
+            document.getElementById("LIST" + schduleChecked.get(i).courseIDList[0]).style.color = "black";
         }
     }
     tempIDbindbtn.delete(id);
@@ -280,7 +286,7 @@ function makeUserTableView(data) {
             //處理schduleChecked資料
             let schdule = schduleChecked.get(id);
             schdule.size += 1;
-            schdule.tempIDs.push(courseID);
+            schdule.courseIDList.push(courseID);
 
             if (schdule.size > 1) {
                 //處理table背景
@@ -288,7 +294,7 @@ function makeUserTableView(data) {
                 tdBcCor.style.background = "red";
 
                 //處理list背景
-                for (let conflict of schdule.tempIDs) {
+                for (let conflict of schdule.courseIDList) {
                     listID = "LIST" + String(conflict);
                     let listCor = document.getElementById(listID);
                     listCor.style.color = "red";
@@ -337,11 +343,11 @@ window.addEventListener("message", function (event) {
 // 
 
 function exportJson() {
-    let courseName = document.getElementsByClassName("courseName");
-    let courseCredit = document.getElementsByClassName("courseCredit");
-    let courseTeacher = document.getElementsByClassName("courseTeacher");
-    let courseCode = document.getElementsByClassName("courseCode");
-    let courseTime = document.getElementsByClassName("courseTime");
+    let courseName = document.getElementsByClassName(COURSE_CLASS_NAME);
+    let courseCredit = document.getElementsByClassName(COURSE_CLASS_CREDIT);
+    let courseTeacher = document.getElementsByClassName(COURSE_CLASS_TEACHER);
+    let courseCode = document.getElementsByClassName(COURSE_CLASS_CODE);
+    let courseTime = document.getElementsByClassName(COURSE_CLASS_TIME);
 
     let exportList = [];
 
@@ -395,7 +401,7 @@ function exportCode() {
 
     if (textView) {
         let strs = "";
-        for (let str of document.getElementsByClassName("courseCode")) {
+        for (let str of document.getElementsByClassName(COURSE_CLASS_CODE)) {
             console.log(strs);
             strs += (str.textContent + '\n');
         }
