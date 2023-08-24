@@ -58,9 +58,15 @@ let col = DEF_COL;
 let tbRowTdListChange = false;
 
 // 視窗
-let addCourseWindow;
+let addCourseWindow = null;
 // ========================= 主頁面
 
+//function: 處理row、col儲存到本地
+function handleSizeChange(){
+    // 資料存到本地給子視窗使用
+    localStorage.setItem('row', JSON.stringify(row));
+    localStorage.setItem('col', JSON.stringify(col));
+}
 
 //function: 處理表格標頭，修改後儲存到本地
 function handleInputChange() {
@@ -84,8 +90,7 @@ function handleInputChange() {
     }
 
     // 資料存到本地給子視窗使用
-    localStorage.setItem('row', JSON.stringify(row));
-    localStorage.setItem('col', JSON.stringify(col));
+    handleSizeChange();
     localStorage.setItem('rowTitleText', JSON.stringify(rowTitleList));
     localStorage.setItem('colTitleText', JSON.stringify(colTitleList));
 }
@@ -148,6 +153,9 @@ function InitialView() {
                 tbRowTdListChange = true;
             });
     }
+
+    // ========================= 初始化本地端資料
+    handleInputChange();
 }
 
 // ========================= 初始化左半表格
@@ -282,13 +290,12 @@ function removeCourse(courseID) {
 // 插入表格 喚出設定表單
 
 function insertCourse() {
-
     if(tbRowTdListChange)   handleInputChange();
+    else handleSizeChange();
 
     //如果undefine代表視窗為創建，此舉可限制視窗只出現一次
-    if (addCourseWindow == undefined) {
+    if (addCourseWindow == null || addCourseWindow.window == null) {
         addCourseWindow = window.open("./html/insertCourse.html", "_blank", "width=" + WIDTH_S + ",height=" + HEIGHT_S + ", top=" + TOP_S + ", left=" + LEFT_S);
-
 
         // 傳遞資料給setting
     }
@@ -391,6 +398,8 @@ window.addEventListener("message", function (event) {
         document.getElementById(L_TABLE_DOM_ID).remove();
         InitialView();
     }
+
+    addCourseWindow = null;
 });
 
 // 

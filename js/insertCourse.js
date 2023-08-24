@@ -4,6 +4,10 @@ let col = JSON.parse(localStorage.getItem('col'));
 let rowTitleText = JSON.parse(localStorage.getItem('rowTitleText'));
 let colTitleText = JSON.parse(localStorage.getItem('colTitleText'));
 
+if(row == null || col ==null || rowTitleText == null || colTitleText == null){
+    console.log("insert頁面的基礎資料為 null");
+}
+
 
 // ========== 主畫面 ==========
 
@@ -13,9 +17,9 @@ let colTitleText = JSON.parse(localStorage.getItem('colTitleText'));
 let insertCourseRightDiv = document.getElementById("insertCourseRightDiv");
 // 選擇_表格
 let choostTableStr = "<table id='chooseTable'>"
+
 for (let i = 0; i < row; i++) {
     choostTableStr += "<tr>";
-
     for (let j = 0; j < col; j++) {
         // 左上空格
         if (i == 0 && j == 0) {
@@ -32,7 +36,6 @@ for (let i = 0; i < row; i++) {
         //處理其他地方
         else {
             let id = String(i) + "-" + String(j);
-            console.log(id);
             choostTableStr = choostTableStr + "<td><button id='" + String(id) + "' onclick='buttonChoose(\"" + String(id) + "\")'></button></td>";
         }
     }
