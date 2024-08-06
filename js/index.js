@@ -1,478 +1,474 @@
-// _______________________________ <ID資料管理 _______________________________
-// 課程ID (不重複)
-let courseID = 0;
+// ======= CLASS DEFINE 資料定義 ======
 
-// posID: 用來記錄表格中課程的位置信息，為td的id
-// courseID: 為courseListRow的id，可用於獲得課程基礎資料
-// 註: 這裡的id型態都為str
-
-
-//function: LIST_ID_NAME為ID前綴可在data.js修改
-function getCourseListRowID(courseID) {
-    return LIST_ID_NAME + String(courseID);
+// 設定
+class SETTING {
+    static colspan_width_when_code_list_is_empty = 10;
+    static COL_TITLE_LIST = ["", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+    static ROW_TITLE_LIST = ["", "第一節 0810-0900", "第二節 0910-1000", "第三節 1010-1100", "第四節 1110-1200", "中午   1210-1300", "第五節 1310-1400", "第六節 1410-1500", "第七節 1510-1600", "第八節 1610-1700", "傍晚   1710-1800", "第十節 1820-1910", "第十節 1915-2005", "第十一節 2015-2105", "第十二節 2110-2200"]
 }
 
-//function: TB_BTN_ID_NAME為ID前綴可在data.js修改
-function getTableBtnID(posID, courseID) {
-    return TB_BTN_ID_NAME + String(posID) + ID_CONNECT_CHAT + String(courseID);
-}
+// 資料處理
+class COURSE {
+    static course_json;
+    static dp_dict; // 系所與課程 department and class
+    static codes_dict;
+    static code_list_selected = [];
+    static conflict_dict = {};
 
-function getPosID(row_, col_) {
-    return String(row_) + ID_CONNECT_CHAT + String(col_);
-}
-
-//function: 透過courseID獲取posID 
-function getPosIDList(courseID) {
-    // courseListRow: 指的是courseListView的其中一列
-    let courseListRow = document.getElementById(getCourseListRowID(courseID));
-
-    //debug
-    if (courseListRow == null) console.log("getCourseListRow失敗 getPosIDList()");
-
-    // courseTime: 紀錄著課程時段
-    let posIDList = courseListRow.getElementsByClassName(COURSE_CLASS_TIME)[0].textContent.split(' ');
-
-    //debug
-    if (posIDList == null) console.log("posIDList為空 getPosIDList()");
-
-    // contentText可以取出裡面的內容，通常是不能變動的才能用contentText
-    return posIDList;
-}
-
-// 獲取contorl物件的id
-function getCtrlObjID(courseID) {
-    return CONTROL_ID_NAME + courseID;
-}
-
-// _______________________________ ID資料管理> _______________________________
+    // 初始化
+    /**
+     * 初始化
+     * @param {dict} json - code.json
+     */
+    static init(json) {
+        this.course_json = json;
+        this.dp_dict = json["selDp"];
+        this.codes_dict = json["codes_dict"];
+    } // 初始化
 
 
+    // 增加與刪除
+    /**
+     * 將課程加入已選擇課程
+     * @param {string} code - 課程代碼
+     */
+    static add_course_to_code_list_selected(code) {
+        console.log("使用者選擇了課程: " + code);
 
-// _______________________________ <初始化與定義 _______________________________
+        // 已選擇的課程
+        this.code_list_selected.push(code);
 
-// 初始化定義
-let row = DEF_ROW;
-let col = DEF_COL;
-
-// 監測表格標題改變
-let tbRowTdListChange = false;
-
-// 視窗
-let addCourseWindow = null;
-// ========================= 主頁面
-
-//function: 處理row、col儲存到本地
-function handleSizeChange(){
-    // 資料存到本地給子視窗使用
-    localStorage.setItem('row', JSON.stringify(row));
-    localStorage.setItem('col', JSON.stringify(col));
-}
-
-//function: 處理表格標頭，修改後儲存到本地
-function handleInputChange() {
-    //debug
-    console.log("========== 偵測到表格標題改變: 修改本地資料 ==========");
-    let rowTitleDomList = document.getElementsByClassName(TABLE_ROW_TITLE_CLASS_NAME);
-    let colTitleDomList = document.getElementsByClassName(TABLE_COL_TITLE_CLASS_NAME);
-    let rowTitleList = [];
-    let colTitleList = [];
-
-    //debug
-    if (rowTitleDomList == null) console.log("rowTitleDomList為空 handleInputChange()");
-    if (colTitleDomList == null) console.log("colTitleDomList為空 handleInputChange()");
-
-    // 傳入DOM造成錯誤，所以將DOM轉成String List傳入
-    for (let i = 0; i < rowTitleDomList.length; i++) {
-        rowTitleList.push(rowTitleDomList[i].value);
-    }
-    for (let i = 0; i < colTitleDomList.length; i++) {
-        colTitleList.push(colTitleDomList[i].value);
-    }
-
-    // 資料存到本地給子視窗使用
-    handleSizeChange();
-    localStorage.setItem('rowTitleText', JSON.stringify(rowTitleList));
-    localStorage.setItem('colTitleText', JSON.stringify(colTitleList));
-}
-
-
-//function: 介面初始化，根據row、col修改表格大小
-function InitialView() {
-
-    // 獲取index 左半部分的位置
-    let LContentDom = document.getElementById(L_CONTENT_DOM_ID);
-
-    //debug
-    if (LContentDom == null) console.log("LContentDom為空 InitialView()");
-    console.log("========== 初始化: row=" + String(row) + " col=" + String(col) + " ==========");
-
-    //處理左半課表
-    let tableString = "<table id = '" + L_TABLE_DOM_ID + "'>";
-    for (let i = 0; i < row; i++) {
-        tableString += "<tr>";
-
-        for (let j = 0; j < col; j++) {
-            // 左上空格
-            if (i == 0 && j == 0) {
-                tableString = tableString + "<th>" + "<input class='" + TABLE_COL_TITLE_CLASS_NAME + "' type='text'></th>";
-            }
-            //處理表格日期標題的部分
-            else if (i == 0) {//第一格要空格，放節數
-                tableString = tableString + "<th>" + "<input class='" + TABLE_ROW_TITLE_CLASS_NAME + "' type='text' value='" + ROW_TITLE_LIST[j] + "'></th>";
-            }
-            // 處理節數標題(側)的部分
-            else if (j == 0 && i != 0) {
-                tableString = tableString + "<td>" + "<input class='" + TABLE_COL_TITLE_CLASS_NAME + "' type='text' value='" + COL_TITLE_LIST[i] + "'></td>";
-            }
-            //處理其他地方
-            else {
-                // 填入posID座標
-                tableString = tableString + "<td id='" + getPosID(i, j) + "'></td>";
+        // 確認衝堂
+        for (const time of this.codes_dict[code]["time"]) {
+            if (Object.keys(this.conflict_dict).includes(time)) {
+                this.conflict_dict[time] += 1;
+            } else {
+                this.conflict_dict[time] = 1;
             }
         }
-        tableString += "</tr>";
-    }
-    tableString += "</table>";
-
-    //將左半部分插入表格
-    LContentDom.innerHTML += tableString;
-
-    // 對input(表格的天、節數)進行監聽，如果改變了則tbRowTdListChange = true
-    let tbRowTdDomList = document.getElementsByClassName(TABLE_ROW_TITLE_CLASS_NAME);
-    for (let tbRowTdDom of tbRowTdDomList) {
-        tbRowTdDom.addEventListener("input",
-            function () {
-                tbRowTdListChange = true;
-            });
     }
 
-    let tbColTdDomList = document.getElementsByClassName(TABLE_COL_TITLE_CLASS_NAME);
-    for (let tbColTdDom of tbColTdDomList) {
-        tbColTdDom.addEventListener("input",
-            function () {
-                tbRowTdListChange = true;
-            });
-    }
+    static rmv_course_from_code_list_selected(code) {
+        console.log("使用者刪除了課程: " + code);
 
-    // ========================= 初始化本地端資料
-    handleInputChange();
-}
+        // 已選擇的課程
+        this.code_list_selected.pop(code);
 
-// ========================= 初始化左半表格
-InitialView();// 介面 初始化
-
-
-
-
-// ========== 右半表格 ==========
-
-
-
-
-// _______________________________ <刪除與隱藏 _______________________________
-
-//function: 移除表格課程衝堂資料，控制紅色警告
-function schduleRmv(posID, courseID) {
-    // schdule 移除 tbBtn課程資料 刪除courseViewRow 衝堂統計
-    let schduleUnit = schdule.get(posID);
-    schduleUnit.size -= 1;
-
-    //List中要移除元素之索引
-    let indexRmv = schduleUnit.courseIDList.indexOf(courseID);
-    // splice(索引, 移除元素量);
-    schduleUnit.courseIDList.splice(indexRmv, 1);
-
-    if (schduleUnit.size == 1) {
-        // 還原背景顏色
-        document.getElementById(posID).style.background = TABLE_TD_BCOR;
-
-        // 還原字體顏色
-        for (let course_ID of schdule.get(posID).courseIDList) {
-            document.getElementById(getCourseListRowID(course_ID)).style.color = COURSE_LIST_ROW_COR;
+        // 衝堂
+        for (const time of this.codes_dict[code]["time"]) {
+            this.conflict_dict[time] -= 1;
         }
     }
-}
 
-//function: 執行表格內課程隱藏，並將列表中課程顏色標記
-function hidden(courseID) {
-    document.getElementById(getCourseListRowID(courseID)).style.color = COURSE_LIST_ROW_HIDDEN_COR;
-    let posIDList = getPosIDList(courseID);
-
-    for (let posID of posIDList) {
-        // 移除表格中課程
-        let tableBtnID = getTableBtnID(posID, courseID);
-        document.getElementById(tableBtnID).remove();
-
-        // 檢查有沒有要消除的紅色警告
-        schduleRmv(posID, courseID);
+    /**
+     * @param {string} code - 課程代碼
+     */
+    static checkbox_change(code) {
+        if (this.is_code_selected(code)) {
+            this.rmv_course_from_code_list_selected(code);
+        } else {
+            this.add_course_to_code_list_selected(code);
+        }
     }
 
-}
+    // is 系列
+    static is_code_selected(code) {
+        return this.code_list_selected.includes(code);
+    }
 
-//function: 展示被表格中被隱藏的課程
-function show(courseID) {
-    let courseListView = document.getElementById(getCourseListRowID(courseID));
-
-    let courseNameStr = courseListView.getElementsByClassName(COURSE_CLASS_NAME)[0].textContent;
-    let courseCreditStr = courseListView.getElementsByClassName(COURSE_CLASS_CREDIT)[0].textContent;
-    let courseTeacherStr = courseListView.getElementsByClassName(COURSE_CLASS_TEACHER)[0].textContent;
-    let courseCodeStr = courseListView.getElementsByClassName(COURSE_CLASS_CODE)[0].textContent;
-    let courseTimeList = courseListView.getElementsByClassName(COURSE_CLASS_TIME)[0].textContent.split(' ');
-
-    let course = new Course(courseNameStr, courseCreditStr, courseTeacherStr, courseCodeStr, courseTimeList);
-
-    for (let posID of course.time) {
-
-        //獲取td 在裡面放入課程BTN
-        let tableTd = document.getElementById(posID);
-        let tableBtnID = getTableBtnID(posID, courseID);
-        tableTd.innerHTML += "<button id='" + tableBtnID + "'>" + course.name + "</button>";
-
-        //設定衝堂資料
-        if (schdule.has(posID)) {
-
-            //schduleUnit: schdule中的某個單位資料
-            let schduleUnit = schdule.get(posID);
-            schduleUnit.size += 1;
-            schduleUnit.courseIDList.push(courseID);
-
-            if (schduleUnit.size > 1) {
-                //處理課程表格td背景 變紅色
-                let tableTd = document.getElementById(posID);
-                tableTd.style.background = TABLE_TD_WARNING_BCOR;
-
-                //處理courseList字 變紅色
-                for (let course_ID of schduleUnit.courseIDList) {
-                    let courseListRow = document.getElementById(getCourseListRowID(course_ID));
-                    courseListRow.style.color = TABLE_TD_WARNING_BCOR;
+    /**
+     * @param {string} code - 課程代碼
+     * @returns {int} 0 表示沒有衝堂 1 表示選擇後將會衝堂 2 表示有衝堂
+     */
+    static is_conflict(code) {
+        let type = 0;
+        for (const time of this.codes_dict[code]["time"]) {
+            let num = this.conflict_dict[time];
+            if (num != undefined) {
+                if (num > 1) {
+                    type = 2;
+                    break;
+                } else if (num == 1) {
+                    type = 1;
                 }
             }
-
-        } else {
-            schdule.set(posID, new Schdule(1, [courseID]));
         }
+
+        return type;
     }
 
-}
 
-//function:  控制隱藏或是展示
-function courseCollapseControl(courseID) {
-    let controlUnit = document.getElementById(getCtrlObjID(courseID));
-    if (controlUnit.innerText == "隱藏") {
-        controlUnit.innerText = "展示";
-        hidden(courseID);
-    } else {
-        controlUnit.innerText = "隱藏";
-        show(courseID);
+    // get 系列
+    
+    static get_credit(){
+      let compulsory_credit = 0;
+      let elective_credit = 0;
+      for(const code of code_list_selected){
+        if(COURSE.codes_dict[code]["type"] === "idk"){
+          compulsory_credit += COURSE.codes_dict[code]["credit"];
+        }
+        else{
+          elective_credit += COURSE.codes_dict[code]["credit"];
+        }
+      }
     }
-}
-
-function removeCourse(courseID) {
-    //先從courseListRow中獲取資料再刪除
-    let posIDList = getPosIDList(courseID);
-    document.getElementById(getCourseListRowID(courseID)).remove();
-
-
-    for (let posID of posIDList) {
-        tableBtnID = getTableBtnID(posID, courseID);
-
-        //移除 tableBTN 和 schdule[posID]中的 size 、 courseIDList
-        schduleRmv(posID, courseID);
-    }
-    tempIDbindbtn.delete(courseID);
-}
-
-// _______________________________ 刪除與隱藏> _______________________________
-
-
-// ========== 下方控制 ==========
-
-// 插入表格 喚出設定表單
-
-function insertCourse() {
-    if(tbRowTdListChange)   handleInputChange();
-    else handleSizeChange();
-
-    //如果undefine代表視窗為創建，此舉可限制視窗只出現一次
-    if (addCourseWindow == null || addCourseWindow.window == null) {
-        addCourseWindow = window.open("./html/insertCourse.html", "_blank", "width=" + WIDTH_S + ",height=" + HEIGHT_S + ", top=" + TOP_S + ", left=" + LEFT_S);
-
-        // 傳遞資料給setting
+    
+    /**
+     * 根據系所代碼取得班級課程
+     * get department class by department value
+     * @param {string} dp_value - 系所代碼
+     * @returns {dict} - 系所的課程
+     */
+    static get_dp_cl_by_dp_value(dp_value) {
+        return this.dp_dict[dp_value]["selCl"];
     }
 
-    tbRowTdListChange = false;
-}
-
-// f函式，被 (produce courseListView)新增資料 使用
-function makeCourseListView(data) {
-    let Time = "";
-
-    for (let str of data.time) {
-        Time += (str + " ");
+    /**
+     * 根據系所班級代碼取得班級課程
+     * get class dict by department and class value
+     * @param {string} dp_value - 系所代碼 "05"
+     * @param {string} cl_value - 班級代碼 名稱 "UI1B"
+     * @returns {dict} - 系所的課程 "name":"", "code":[]
+     */
+    static get_cl_dict_by_dp_cl_value(dp_value, cl_value) {
+        return this.dp_dict[dp_value]["selCl"][cl_value];
     }
-    Time = Time.slice(0, -1);
 
-    let courseListView = document.getElementById("courseListView");
-    let courseListStr = "<tr id='LIST" + String(courseID) + "'>"
-        + "<td class='courseName'>" + data.name + "</td>"
-        + "<td class='courseCredit'>" + data.credit + "</td>"
-        + "<td class='courseTeacher'>" + data.teacher + "</td>"
-        + "<td class='courseCode'>" + data.code + "</td>"
+    /**
+     * @returns {array} - [0] row [1] col
+     */
+    static get_max_rc_from_conflict_dict() {
+        let max_row = 9;
+        let max_col = 5;
 
-        // (courseListViewButton)右表格按鈕處理 隱藏、刪除
-        + "<td><button onclick='" + "removeCourse(" + String(courseID) + ")" + "'>刪除</button>"
-        + "<hr><button id='" + CONTROL_ID_NAME + String(courseID) + "' onclick='courseCollapseControl(" + String(courseID) + ")'>隱藏</button></td>"
-        + "<td class='courseTime'>" + Time + "</td>"
-        + "</tr>"
-    courseListView.innerHTML += courseListStr;
-}
+        for (const [key, value] of Object.entries(this.conflict_dict)) {
+            // 跳過不存在的
+            if (this.conflict_dict[key] == 0) continue;
 
-// f函式，被 (produce courseListView)新增資料 使用
-// f函式，處理衝堂
-let schdule = new Map();
-let tempIDbindbtn = new Map(); //透過tempID尋找btn
+            // 如果存在且最大值符合就修改
+            let row = parseInt(key.split("-")[0]);
+            let col = parseInt(key.split("-")[1]);
 
-function makeUserTableView(data) {
-    for (let id of data.time) {
-        //設定BTN位置
-        console.log(id);
-        let tableTd = document.getElementById(id);
-        let newID = id + ID_CONNECT_CHAT + courseID;
-        tableTd.innerHTML += "<button id='" + String(newID) + "'>" + data.name + "</button>";
-
-
-        //設定衝堂資料
-        if (schdule.has(id)) {
-            //處理schduleChecked資料
-            let schduleUnit = schdule.get(id);
-            schduleUnit.size += 1;
-            schduleUnit.courseIDList.push(courseID);
-
-            if (schduleUnit.size > 1) {
-                //處理table背景
-                let tdBcCor = document.getElementById(id);
-                tdBcCor.style.background = "red";
-
-                //處理list背景
-                for (let conflict of schduleUnit.courseIDList) {
-                    listID = "LIST" + String(conflict);
-                    let listCor = document.getElementById(listID);
-                    listCor.style.color = "red";
-                }
+            if (row > max_row) {
+                max_row = row
             }
-
-        } else {
-            schdule.set(id, new Schdule(1, [courseID]));
+            if (col > max_col) {
+                max_col = col;
+            }
         }
 
-        // tempid找pos
-        if (tempIDbindbtn.has(courseID)) {
-            let bind = tempIDbindbtn.get(courseID);
-            bind.push(id);
-        } else {
-            tempIDbindbtn.set(courseID, [id]);
+        return [max_row, max_col];
+    }
+}
+
+// ======= GLOBAL VARIABLES ======
+
+// ======= CONST VARIABLES ======
+
+
+// ======= FUNCTION 函式 ======
+
+// 讀取 code.json
+async function read_code_json() {
+    try {
+        const response = await fetch('../course_ori.json'); // 發送請求讀取 code.json
+        const json = await response.json(); // 讀取 response 的 json 資料
+        // console.log(json);
+        return json; // 將資料回傳給程式碼
+    } catch (error) {
+        console.error(error); // 如果讀取失敗，則顯示錯誤訊息
+    }
+}
+
+// === UI 處理 ===
+
+// 產生系所選單
+function generate_depatment_option() { // id = selDp
+    let department_select_ele = document.getElementById("selDp"); // select元素
+    let htmlString = ""; // 選單內容字串
+
+    for (const [selDp_num, dict] of Object.entries(COURSE.dp_dict)) { // 所有系所部門資料與代碼
+        htmlString += "<option value=" + selDp_num + ">" + dict["name"] + "</option>"; // 產生選項
+    }
+
+    department_select_ele.innerHTML += htmlString; // 設定選單內容
+
+    // 默認選擇資工系
+    department_select_ele.selectedIndex = 10;
+    generate_class_select(department_select_ele.value);
+
+    // 監聽選擇事件
+    department_select_ele.addEventListener("change", function () {
+        // 這便還未寫出，先留著 
+        // 根據對應的系所部門來產生多個班級課程列表
+
+        if (department_select_ele.value == "none") {
+            console.log("使用者選擇了: 無");
+
+            // 不要產生班級課程列表
+            let class_select_ele = document.getElementById("selCl-span"); // div元素
+            class_select_ele.innerHTML = ""; // 清除內容
         }
+        else {
+            console.log("使用者選擇了: " + COURSE.dp_dict[department_select_ele.value]["name"]);
 
-    }
-    courseID++;
+            // 產生班級課程列表
+            generate_class_select(department_select_ele.value);
+        }
+    });
 }
 
+// 產生班級選單
+/**
+ * @param {string} dp_value - 系所代碼
+ */
 
-// ========== 資料回傳 ==========
-window.addEventListener("message", function (event) {
-    let [site, type, data] = event.data;
-    //debug
-    console.log("偵測到信息傳入來自" + site);
+function generate_class_select(dp_value) {
 
-    //處理 (produce courseListView)新增資料 的事
-    if (type == "type 1") {
+    // div元素設定初始內容
+    document.getElementById("selCl-span").innerHTML = `
+    <select id=\"selCl\">
+        <option value=\"none\">無</option>
+    </select>`;
 
-        //處理右邊list表格的新增
-        makeCourseListView(data);
+    let class_select_ele = document.getElementById("selCl"); // select元素
+    let htmlString = ""; // 選單內容字串
+    let class_option_data = COURSE.get_dp_cl_by_dp_value(dp_value);
 
-        //處理左邊tableView的新增 與 處理衝堂
-        makeUserTableView(data);
-    } else {
-        row = data[0];
-        col = data[1];
-        document.getElementById(L_TABLE_DOM_ID).remove();
-        InitialView();
+    for (const [class_code, dict] of Object.entries(class_option_data)) { // 所有系所部門資料與代碼
+        htmlString += "<option value=" + class_code + ">" + class_code + " " + dict["name"] + "</option>"; // 產生選項
     }
 
-    addCourseWindow = null;
-});
+    class_select_ele.innerHTML += htmlString; // 設定選單內容
+    class_select_ele.selectedIndex = 0; // 默認設定為 0 無
 
-// 
+    // 監聽選擇事件
+    class_select_ele.addEventListener("change", function () {
+        // 這便還未寫出，先留著
 
-function exportJson() {
-    let courseName = document.getElementsByClassName(COURSE_CLASS_NAME);
-    let courseCredit = document.getElementsByClassName(COURSE_CLASS_CREDIT);
-    let courseTeacher = document.getElementsByClassName(COURSE_CLASS_TEACHER);
-    let courseCode = document.getElementsByClassName(COURSE_CLASS_CODE);
-    let courseTime = document.getElementsByClassName(COURSE_CLASS_TIME);
+        // log
+        if (class_select_ele.value == "none") {
+            console.log("使用者選擇了: 無");
+            // 不要產生班級課程列表
+        }
+        else {
+            console.log("使用者選擇了: " + class_select_ele.value + " " + class_option_data[class_select_ele.value]["name"]);
 
-    let exportList = [];
-
-    // 包含物件的List
-    for (let i = 0; i < courseName.length; i++) {
-        exportList.push(new Course(courseName[i].textContent, courseCredit[i].textContent, courseTeacher[i].textContent, courseCode[i].textContent, courseTime[i].textContent.split(' ')));
-    }
-
-    const jsonStr = JSON.stringify(exportList);
-
-    // Blob 
-    const blob = new Blob([jsonStr], { type: "application/json" });
-
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = "lists.json";
-
-
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
+            // 產生班級課程列表
+            generate_course_table(dp_value, class_select_ele.value);
+        }
+    });
 }
 
+// 根據班級產生課程列表
+/**
+ * @param {string} dp_value - 系所代碼
+ * @param {string} class_value - 班級名稱
+ * @param {dict} code_list - 班級課程列表
+*/
 
-//drop dile
-var fileInput = document.getElementById('fileInput');
-fileInput.addEventListener('change', function (event) {
+// 生成完整課表 包含 tabs 和 list
+function generate_course_table(dp_value, class_value) {
+    const class_dict = COURSE.get_cl_dict_by_dp_cl_value(dp_value, class_value);
+    const code_list = class_dict["code_list"];
+
+    console.log(`生成 ${class_value} 的課程列表`);
+    let course_tbody = document.getElementById("course-tbody");
+    course_tbody.innerHTML = "";
+
+    // 如果 code_list 為空
+    if (code_list.length === 0) {
+        console.log("班級課程列表為空");
+        course_tbody.innerHTML = `<tr><td colspan='${SETTING.colspan_width_when_code_list_is_empty}'>班級課程列表為空</td></tr>`;
+        return;
+    }
+
+    // 將 tr html 字串加入 table 內
+    course_tbody.innerHTML += make_tr_html_by_code_list(code_list);
+
+    // 使用委派方式來統一處理 checkbox 事件
+    course_tbody.querySelectorAll("input[type='checkbox']").forEach((checkbox, index) => {
+        checkbox.addEventListener("change", function () {
+            COURSE.checkbox_change(code_list[index]);
+            generate_course_table(dp_value, class_value);
+        });
+    });
+
+}
+
+// 生成使用者選擇的課程列表
+function generate_selected_course_table() {
+    const code_list = COURSE.code_list_selected;
+    console.log(`生成 使用者 選擇的課程列表`);
+    let course_tbody = document.getElementById("course-tbody");
+    course_tbody.innerHTML = "";
+
+    // 如果 code_list 為空
+    if (code_list.length === 0) {
+        console.log("使用者 未選擇課程");
+        course_tbody.innerHTML = `<tr><td colspan='${SETTING.colspan_width_when_code_list_is_empty}'>使用者 未選擇課程</td></tr>`;
+        return;
+    }
+
+    // 將 tr html 字串加入 table 內
+    course_tbody.innerHTML += make_tr_html_by_code_list(code_list);
+
+    // 使用委派方式來統一處理 checkbox 事件
+    course_tbody.querySelectorAll("input[type='checkbox']").forEach((checkbox, index) => {
+        checkbox.addEventListener("change", function () {
+            COURSE.checkbox_change(code_list[index]);
+            generate_selected_course_table();
+        });
+    });
+}
+
+// 副程式: 產生 tr 的 HTML 字串
+/**
+ * @param {list} code_list - 課程代碼列表
+ * @returns {string} - tr 的 HTML 字串
+ */
+function make_tr_html_by_code_list(code_list) {
+    const codes_dict = COURSE.codes_dict;
+    let htmlString = "";
+
+    for (const code of code_list) {
+        const code_dict = codes_dict[code];
+        let checked = COURSE.is_code_selected(code) ? "checked" : "";
+        let color = ""; // 未設定，根據衝堂結果不同
+        const time_string = code_dict["time_string"].replace(/\|/g, "|<br/>");
+        let type_color = (code_dict["type"] == "必修")? "type_red" : "type_green";
+
+        // 使用模板字面值來生成 HTML 字串
+        htmlString += `
+        <tr ${color} id='${code}_tr'>
+            <td class='status'><input type='checkbox' ${checked}></td>
+            <td class='code'><a href='https://selquery.ttu.edu.tw/Main/syllabusview.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a></td>
+            <td class='name'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code_dict["name"]}</a></td>
+            <td class='teacher'>${code_dict["teacher"]}</td>
+            <td class='type ${type_color}'>${code_dict["type"]}</td>
+            <td class='credit'>${code_dict["credit"]}</td>
+            <td class='hour'>${code_dict["hour"]}</td>
+            <td class='time_string'>${time_string}</td>
+            <td class='c_type_str'>${code_dict["c_type_str"]}</td>
+            <td class='note'>${code_dict["note"]}</td>
+        </tr>`;
+    }
+
+    return htmlString;
+}
+
+function open_schedule() {
+    let tableHTML = document.querySelector('#schedule-view table').innerHTML;
+    localStorage.setItem('tableHTML', tableHTML);
+    console.log(tableHTML);
+}
+
+// 複製課程代碼
+function copy_code() {
+    let checked_data = COURSE.get_checked_data();
+    let text = "";
+
+    for (let data of checked_data) {
+        text += data.code + "\n";
+    }
+
+    // 取得要複製的文字
+    const textarea = document.getElementById('codes');
+    textarea.value = text;
+
+    // 選中 textarea 中的文字
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+
+    // 執行複製動作
+    document.execCommand('copy'); // 宣告在這裡標示為已淘汰。
+
+    // 提示使用者已複製文字
+    alert('已複製文字到剪貼板');
+
+}
+
+// ==== 導入json button ====
+// 讀取json檔案
+function file_input_process(event) {
+    console.log("file_input_process()");
+    // 獲取事件目標（input file 元素）的第一個選定文件
     var file = event.target.files[0];
+    // 創建一個 FileReader 物件來讀取文件內容
     var reader = new FileReader();
 
+    // 當 FileReader 完成讀取時觸發的事件處理程序
     reader.onload = function (event) {
+        // 獲取文件內容
         var fileContent = event.target.result;
-        var ALLcourse = JSON.parse(fileContent);
+
+        let class_list_copy = [...COURSE.class_list];
+        // 將文件內容解析為 JSON 格式
+        COURSE.concat_data(JSON.parse(fileContent));
 
 
-        for (let course of ALLcourse) {
-            //處理右邊list表格的新增
-            makeCourseListView(course);
-
-            //處理左邊tableView的新增 與 處理衝堂
-            makeUserTableView(course);
+        // 將class_list中的資料繪製到頁面
+        for (let class_s of COURSE.class_list) {
+            if (!class_list_copy.includes(class_s)) {
+                new_class_page(class_s);
+            }
         }
 
     };
 
+    // 將文件內容讀取為文本
     reader.readAsText(file);
-});
+}
 
-function exportCode() {
-    let textView = document.getElementById("code");
+// add event listener
+document.getElementById('show-schedule').addEventListener('click', function () {
+    document.getElementById('schedule-view').style.display = 'flex';
 
-    if (textView) {
-        let strs = "";
-        for (let str of document.getElementsByClassName(COURSE_CLASS_CODE)) {
-            console.log(strs);
-            strs += (str.textContent + '\n');
+    let table = document.querySelector('#schedule-view table');
+    table.innerHTML = "";
+    let [row, col] = COURSE.get_max_rc_from_conflict_dict();
+
+    // 標題 星期日 ~ 星期一
+    let htmlString = "<thead><tr>";
+    for (let i = col; i >= 0; i--) {
+        htmlString += `<th>${SETTING.COL_TITLE_LIST[i]}</th>`;
+    }
+    htmlString += "</tr></thead><tbody id='schedule-tbody'>";
+
+    // 課表
+    for (let j = 1; j <= row; j++) {
+        htmlString += "<tr>";
+        for (let i = col; i > 0; i--) {
+            htmlString += `<td id="${j}-${i}"></td>`;
         }
 
-        textView.value = strs;
+        // 標題 第一 ~ 最後一節
+        htmlString += `<th>${SETTING.ROW_TITLE_LIST[j]}</th></tr>`
     }
+    htmlString += "</tbody>";
+    table.innerHTML = htmlString;
+
+    // 填入課表
+    const code_list = COURSE.code_list_selected;
+    for (const code of code_list) {
+        for (const time of COURSE.codes_dict[code]["time"]) {
+            let htmlString = `<div class='${code}'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a><br><p>${COURSE.codes_dict[code]["name"]}</p></div>`;
+
+            document.getElementById(time).innerHTML += htmlString;
+        }
+    }
+});
+
+document.getElementById('close-schedule').addEventListener('click', function () {
+    document.getElementById('schedule-view').style.display = 'none';
+});
+
+// ====== Main ======
+
+async function main() {
+    COURSE.init(await read_code_json()); // 初始讀取 code.json
+    generate_depatment_option();
 
 }
 
-function RCsetting() {
-    let rc = window.open("./html/RC.html", "_blank", "width=500,height=500, top=100, left=500");
-}
+main();

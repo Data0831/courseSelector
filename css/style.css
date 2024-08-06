@@ -1,0 +1,445 @@
+:root {
+    --bg-primary: #1c1c1c;
+    --bg-secondary: #2c2c2c;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --accent: #ff6b6b;
+    --border: #444444;
+}
+
+body {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 400;
+    font-style: normal;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+option,
+select {
+    font-family: "LXGW WenKai Mono TC", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.container {
+    /* display: flex; */
+    min-height: 100vh;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#schedule-view {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+
+#schedule-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#schedule-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-height: 80%; /* 限制高度 */
+    overflow-y: auto; /* 允許垂直滾動 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#schedule-table-content {
+    display: flex;
+    flex-direction: row;
+}
+
+#close-schedule {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#schedule-view table {
+    font-size: 10px;
+    /* width: 100%; */
+    border-collapse: collapse;
+    border-spacing: 0 8px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+#schedule-view td {
+    border: 1px solid #ddd;
+    /* padding: 8px; */
+    text-align: center;
+}
+
+#schedule-view tr:hover {
+    background-color: #ddd;
+}
+
+
+.site-title {
+    color: var(--accent);
+    font-size: 2.5em;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.site-title:hover {
+    transform: scale(1.05);
+}
+
+.site-title small {
+    margin-left: 20px;
+    font-size: 0.5em;
+    color: var(--text-secondary);
+}
+
+main {
+    display: flex;
+    flex: 1;
+}
+
+.sidebar {
+    flex: 0 0 60px;
+    padding: 20px 10px;
+    background-color: var(--bg-secondary);
+    border-radius: 10px 0 0 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar:hover {
+    flex: 0 0 200px;
+}
+
+.btn {
+    display: block;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 10px;
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 10%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0;
+    text-align: center;
+    line-height: 40px;
+    color: rgb(237, 237, 237);
+    font-weight: bold;
+    font-size: 14px;
+    font-family: "LXGW WenKai Mono TC", monospace;
+}
+
+.sidebar:hover .btn {
+    width: calc(100% - 20px);
+    border-radius: 5px;
+    padding: 0 10px;
+    text-align: left;
+}
+
+.sidebar:hover .file-upload label {
+    width: calc(80%);
+}
+
+.btn:hover {
+    background-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.2);
+}
+
+.content {
+    flex: 1;
+    background-color: var(--bg-secondary);
+    border-radius: 0 10px 10px 0;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filters {
+    margin-bottom: 20px;
+}
+
+select {
+    padding: 10px;
+    margin-right: 10px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+select:hover,
+select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+#course-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+#course-table th,
+#course-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+#course-table th {
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    font-weight: bold;
+}
+
+#course-table th:nth-child(1) {
+    width: 4%;
+}
+
+#course-table th:nth-child(2) {
+    width: 5%;
+}
+
+#course-table th:nth-child(3) {
+    width: 8%;
+}
+
+#course-table th:nth-child(4) {
+    width: 5%;
+}
+
+#course-table th:nth-child(5) {
+    width: 3%;
+}   
+
+#course-table th:nth-child(6) { 
+    width: 3%;
+}
+
+#course-table th:nth-child(7) {
+    width: 3%;
+}
+
+#course-table th:nth-child(8) {
+    width: 15%;
+}
+
+#course-table th:nth-child(9) {
+    width: 8%;
+}
+
+#course-table th:nth-child(10) {
+    width: 13%;
+}
+
+#course-table tr {
+    background-color: var(--bg-primary);
+    transition: all 0.3s ease;
+}
+
+#course-table td {
+    color: var(--text-primary);
+}
+
+#course-table tr:hover {
+    background-color: var(--bg-secondary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#course-table input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#course-table input[type="checkbox"]:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+#course-table input[type="checkbox"]:checked::after {
+    content: '\2714';
+    display: block;
+    text-align: center;
+    color: var(--bg-primary);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+#course-table a{
+    color: white;
+}
+
+#course-table .type_red{
+    color: red;
+}
+
+#course-table .type_green{
+    color: green;
+}
+
+#course-table .time_string{
+    font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        border-radius: 10px 10px 0 0;
+        margin-bottom: 20px;
+    }
+
+    .sidebar:hover {
+        width: 100%;
+    }
+
+    .content {
+        border-radius: 0 0 10px 10px;
+    }
+}
+
+#schedule-content .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-right: 5%;
+}
+
+#schedule-content .header .btn{
+    width: 10%;
+}
+
+
+/* 全局樣式 */
+#schedule-table-content {
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+/* 表格樣式 */
+#schedule-table-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+#schedule-table-content th, #schedule-table-content td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#schedule-table-content thead {
+    background-color: #4a4a4a;
+    color: #fff;
+}
+
+/* 隔行變色 */
+#schedule-table-content tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* 課程格子樣式 */
+#schedule-table-content td div {
+    background-color: #e6f3ff;
+    border-radius: 4px;
+    padding: 8px;
+    margin: -8px;
+}
+
+/* 課程連結樣式 */
+#schedule-table-content td a {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#schedule-table-content td a:hover {
+    text-decoration: underline;
+}
+
+/* 課程名稱樣式 */
+#schedule-table-content td p {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+}
+
+#schedule-table-content .btn:hover {
+    background-color: #45a049;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    #schedule-table-content table {
+        font-size: 0.9em;
+    }
+    
+    #schedule-table-content th, #schedule-table-content td {
+        padding: 8px;
+    }
+    
+    #schedule-table-content{
+        position: static;
+        text-align: center;
+        margin-top: 20px;
+    }
+}

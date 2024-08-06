@@ -1,60 +1,88 @@
 <!DOCTYPE html>
-<html lang="zh-tw">
+<html lang="zh-TW">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>課表選擇</title>
-    <link rel="stylesheet" href="css/index.css">
+    <title>選課模擬 By Data0831</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC&family=Noto+Sans+TC:wght@100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <div id="mainContentView">
-        <!-- 左上圖表部分 -->
-        <div id="LContent"></div>
+    <div class="container">
+        <header>
+            <h3 class="site-title">選課模擬<small>By Data0831</small></h1>
+        </header>
 
-        <!-- 右上列表部分 -->
-        <div id="RContent">
-            <table id="courseListView">
-                <tr>
-                    <th>課程名稱</th>
-                    <th>學分數</th>
-                    <th>教師</th>
-                    <th>課程代碼</th>
-                    <th>控制</th>
-                    <th>時段</th>
-                </tr>
-            </table>
+        <!-- schedule-view -->
+        <div id="schedule-view">
+            <div id="schedule-overlay">
+                <div id="schedule-content">
+                    <span id="close-schedule">&times;</span>
+                    <div class="header">
+                        <h1>課程表</h1>
+                        <a class="btn" href="test.html" target="_blank" onclick="open_schedule()">其他分頁開啟</a>
+                    </div>
+
+                    <!-- 行程內容... -->
+                    <span id="schedule-table-content">
+
+                        <table></table>
+                    </span>
+                </div>
+            </div>
         </div>
+
+        <main>
+            <aside class="sidebar">
+                <div class="file-upload">
+                    <label for="fileInput" class="btn">上傳資料</label>
+                    <input type="file" id="fileInput" onchange="file_input_process(event)" hidden>
+                </div>
+                <button class="btn" onclick="generate_selected_course_table()">已選課程</button>
+                <button class="btn" id="show-schedule">展示課表</button>
+                <button class="btn" onclick="copy_code()">複製代碼</button>
+            </aside>
+            <section class="content">
+                <div class="filters">
+                    <select id="selDp">
+                        <option value="none">無</option>
+                        <!-- 其他選項 -->
+                    </select>
+                    <span id="selCl-span">
+                        <select id="selCl">
+                            <option value="none">無</option>
+                            <!-- 其他選項 -->
+                        </select>
+                    </span>
+                </div>
+                <table id="course-table">
+                    <thead>
+                        <tr>
+                            <th>狀態</th>
+                            <th>代碼</th>
+                            <th>課程</th>
+                            <th>教師</th>
+                            <th>選別</th>
+                            <th>學分</th>
+                            <th>時數</th>
+                            <th>時間</th>
+                            <th>課程類型</th>
+                            <th>附註</th>
+                        </tr>
+                    </thead>
+                    <tbody id="course-tbody">
+                        <!-- 課程資料將由JavaScript動態填充 -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
     </div>
-
-    <!-- 下方控制元件 -->
-    <div id="controlView">
-        <hr>
-        <button id="addCourse" onclick="insertCourse()">新增課程</button>
-        <span>&nbsp;&nbsp;</span>
-
-        <button id="export" onclick="exportJson()">導出Json</button>
-        <span>&nbsp;&nbsp;</span>
-
-        <input type="file" id="fileInput">
-        <span>&nbsp;&nbsp;</span>
-
-        
-
-        <button id="RCsetting" onclick="RCsetting()">設定表格節數與天數</button>
-        <span>&nbsp;&nbsp;</span>
-
-        <h3 style="color: red;">註: 調整表格節數與天數前請保存</h3>
-    </div>
-    <div>
-        <textarea id="code" cols="30" rows="10"></textarea>
-        <br>
-        <button id="exportCode" onclick="exportCode()">導出課程代碼</button>
-        <span>&nbsp;&nbsp;</span>
-    </div>
-
-
     <script src="js/data.js"></script>
     <script src="js/index.js"></script>
 </body>
