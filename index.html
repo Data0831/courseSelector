@@ -45,7 +45,7 @@
                     <input type="file" id="fileInput" onchange="json_upload(event)" hidden>
                 </div>
                 <button class="btn" onclick="json_download()">下載資料</button>
-                <button class="btn" onclick="generate_selected_course_table()">已選課程</button>
+                <button class="btn" onclick="generate_selected_course()">已選課程</button>
                 <button class="btn" id="show-schedule">展示課表</button>
                 <button class="btn" onclick="copy_code()">複製代碼</button>
             </aside>
@@ -73,6 +73,9 @@
                     <tbody id="course-tbody">
                         <!-- 課程資料將由JavaScript動態填充 -->
                     </tbody>
+                </table>
+                <table id="credit-table">
+                    
                 </table>
             </section>
         </main>

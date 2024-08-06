@@ -104,14 +104,16 @@ class COURSE {
     static get_credit() {
         let compulsory_credit = 0;
         let elective_credit = 0;
-        for (const code of code_list_selected) {
+        for (const code of this.code_list_selected) {
             if (COURSE.code_dict[code]["selection"] === "必修") {
-                compulsory_credit += COURSE.code_dict[code]["credit"];
+                compulsory_credit += parseInt(COURSE.code_dict[code]["credit"]);
             }
             else {
-                elective_credit += COURSE.code_dict[code]["credit"];
+                elective_credit += parseInt(COURSE.code_dict[code]["credit"]);
             }
         }
+
+        return [compulsory_credit, elective_credit];
     }
 
     /**
@@ -453,6 +455,24 @@ function generate_other_course(arr) {
 function generate_selected_course(arr) {
     const code_list = COURSE.code_list_selected;
     generate_course_table("使用者", code_list, generate_selected_course, [])
+
+    let compulsory_credit, elective_credit;
+    [compulsory_credit, elective_credit] = COURSE.get_credit();
+
+    let htmlString = `
+        <tr>
+            <td>必修</td>
+            <td>${compulsory_credit}</td>
+            <td>選修</td>
+            <td>${elective_credit}</td>
+        </tr>
+        <tr>
+            <td>總學分</td>
+            <td>${compulsory_credit + elective_credit}</td>
+        </tr>
+    `
+
+    document.getElementById("course-tbody").innerHTML += htmlString
 }
 
 // 副程式
