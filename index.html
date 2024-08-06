@@ -42,24 +42,18 @@
             <aside class="sidebar">
                 <div class="file-upload">
                     <label for="fileInput" class="btn">上傳資料</label>
-                    <input type="file" id="fileInput" onchange="file_input_process(event)" hidden>
+                    <input type="file" id="fileInput" onchange="json_upload(event)" hidden>
                 </div>
+                <button class="btn" onclick="json_download()">下載資料</button>
                 <button class="btn" onclick="generate_selected_course_table()">已選課程</button>
                 <button class="btn" id="show-schedule">展示課表</button>
                 <button class="btn" onclick="copy_code()">複製代碼</button>
             </aside>
             <section class="content">
                 <div class="filters">
-                    <select id="selDp">
-                        <option value="none">無</option>
-                        <!-- 其他選項 -->
-                    </select>
-                    <span id="selCl-span">
-                        <select id="selCl">
-                            <option value="none">無</option>
-                            <!-- 其他選項 -->
-                        </select>
-                    </span>
+                    <span id="sel1"></span>
+                    <span id="sel2"></span>
+                    <span id="sel3"></span>
                 </div>
                 <table id="course-table">
                     <thead>
