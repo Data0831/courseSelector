@@ -8,7 +8,7 @@ class SETTING {
     static github_json_path = "/courseSelector/"
 }
 
-// 資料處理
+// 資料處理x
 class COURSE {
     static course_json;
     static dp_dict; // 系所與課程 department and class
