@@ -36,6 +36,8 @@ class COURSE {
      */
     static add_course_to_code_list_selected(code) {
         console.log("使用者選擇了課程: " + code);
+        alertSystem.showAlert("使用者選擇了課程: " + code);
+        
         // 已選擇的課程
         this.code_list_selected.push(code);
 
@@ -51,6 +53,7 @@ class COURSE {
 
     static rmv_course_from_code_list_selected(code) {
         console.log("使用者刪除了課程: " + code);
+        alertSystem.showAlert("使用者刪除了課程: " + code);
 
         // 衝堂
         for (const time of this.code_dict[code]["time"]) {
@@ -183,12 +186,12 @@ async function read_code_json() {
     try {
         const response = await fetch('/course.json'); // 發送請求讀取 code.json
         const json = await response.json(); // 讀取 response 的 json 資料
-        // console.log(json);
+
         return json; // 將資料回傳給程式碼
     } catch (error) {
         const response = await fetch('/courseSelector/course.json'); // 發送請求讀取 code.json
         const json = await response.json(); // 讀取 response 的 json 資料
-        // console.log(json);
+
         return json; // 將資料回傳給程式碼
 
         console.error(error); // 如果讀取失敗，則顯示錯誤訊息
@@ -488,6 +491,7 @@ function generate_course_table(name, code_list, refresh, arr) {
     // 如果 code_list 為空
     if (code_list.length === 0) {
         console.log(`${name}班級課程列表為空`);
+        alertSystem.showAlert(`${name}班級課程列表為空`);
         course_tbody.innerHTML = `<tr><td colspan='${SETTING.colspan_width_when_code_list_is_empty}'>班級課程列表為空</td></tr>`;
         return;
     }
@@ -574,11 +578,11 @@ function copy_code() {
     navigator.clipboard.writeText(codes_text)
         .then(() => {
             console.log(`成功複製 ${codes_text} 到剪貼簿`);
-            // 在这里添加你的成功处理逻辑
+            alertSystem.showAlert(`成功複製 ${codes_text} 到剪貼簿`);
         })
         .catch((error) => {
             console.error("複製失敗", error);
-            // 在这里添加你的错误处理逻辑
+            alertSystem.showAlert("複製失敗");
         });
 
 }
@@ -598,6 +602,7 @@ function json_upload(event) {
         var fileContent = event.target.result;
         // 將文件內容解析為 JSON 格式
         console.log(`使用者匯入 ${JSON.parse(fileContent)}`);
+        alertSystem.showAlert(`使用者匯入 ${JSON.parse(fileContent)}`);
         COURSE.code_list_selected = COURSE.code_list_selected.concat(JSON.parse(fileContent));
         generate_selected_course([]);
     };
@@ -611,6 +616,8 @@ function json_download() {
     console.log("json_download()");
     // 將列表轉換為 JSON 字符串
     const jsonData = JSON.stringify(COURSE.code_list_selected);
+
+    alertSystem.showAlert(`使用者下載了 data.json`);
 
     // 創建一個隱藏的 <a> 元素來下載檔案
     const downloadLink = document.createElement("a");
@@ -680,7 +687,45 @@ document.getElementById('close-schedule').addEventListener('click', function () 
     document.getElementById('schedule-view').style.display = 'none';
 });
 
+class AlertSystem {
+    constructor() {
+        this.container = document.getElementById('alert-container');
+        this.alerts = [];
+    }
+
+    showAlert(message) {
+        if (this.alerts.length >= 5) {
+            this.removeAlert(this.alerts[0]);
+        }
+
+        const alert = document.createElement('div');
+        alert.className = 'alert';
+        alert.textContent = message;
+
+        this.container.appendChild(alert);
+        this.alerts.push(alert);
+
+        setTimeout(() => {
+            alert.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            this.removeAlert(alert);
+        }, 2000);
+    }
+
+    removeAlert(alert) {
+        alert.classList.add('hide');
+        setTimeout(() => {
+            this.container.removeChild(alert);
+            this.alerts = this.alerts.filter(a => a !== alert);
+        }, 300);
+    }
+}
+
 // ====== Main ======
+// 使用示例
+const alertSystem = new AlertSystem();
 
 async function main() {
     COURSE.init(await read_code_json()); // 初始讀取 code.json
