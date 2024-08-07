@@ -454,7 +454,7 @@ function generate_other_course(arr) {
 // 生成使用者選擇的課程列表
 function generate_selected_course(arr) {
     const code_list = COURSE.code_list_selected;
-    generate_course_table("使用者", code_list, generate_selected_course, [])
+    generate_course_table("使用者", code_list, generate_selected_course, arr)
 
     let compulsory_credit, elective_credit;
     [compulsory_credit, elective_credit] = COURSE.get_credit();
@@ -472,12 +472,13 @@ function generate_selected_course(arr) {
         </tr>
     `
 
-    document.getElementById("course-tbody").innerHTML += htmlString
+    document.getElementById("course-tbody").insertAdjacentHTML('beforeend', htmlString);
+    // document.getElementById("course-tbody").innerHTML += htmlString
 }
 
 // 副程式
 function generate_course_table(name, code_list, refresh, arr) {
-    let course_tbody = document.getElementById("course-tbody");
+    let course_tbody = document.querySelector("#course-tbody");
     course_tbody.innerHTML = "";
 
     if (name === "none") {
@@ -497,6 +498,10 @@ function generate_course_table(name, code_list, refresh, arr) {
     // 將 tr html 字串加入 table 內
     course_tbody.innerHTML += make_tr_html_by_code_list(code_list);
 
+    if (name === "使用者") {
+        // 使用委派方式來統一處理 checkbox 事件
+        console.log( course_tbody.querySelectorAll("input[type='checkbox']"));
+    }
     // 使用委派方式來統一處理 checkbox 事件
     course_tbody.querySelectorAll("input[type='checkbox']").forEach((checkbox, index) => {
         checkbox.addEventListener("change", function () {
