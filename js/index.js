@@ -4,7 +4,7 @@
 class SETTING {
     static colspan_width_when_code_list_is_empty = 10;
     static COL_TITLE_LIST = ["", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
-    static ROW_TITLE_LIST = ["", "第一節 0810-0900", "第二節 0910-1000", "第三節 1010-1100", "第四節 1110-1200", "中午   1210-1300", "第五節 1310-1400", "第六節 1410-1500", "第七節 1510-1600", "第八節 1610-1700", "傍晚   1710-1800", "第十節 1820-1910", "第十節 1915-2005", "第十一節 2015-2105", "第十二節 2110-2200"]
+    static ROW_TITLE_LIST = ["", "第一節<br>0810-0900", "第二節<br>0910-1000", "第三節<br>1010-1100", "第四節<br>1110-1200", "中午  <br>1210-1300", "第五節<br>1310-1400", "第六節<br>1410-1500", "第七節<br>1510-1600", "第八節<br>1610-1700", "傍晚  <br>1710-1800", "第十節<br>1820-1910", "第十節<br>1915-2005", "第十一節<br>2015-2105", "第十二節<br>2110-2200"]
     static github_json_path = "/courseSelector/"
 }
 
@@ -461,13 +461,13 @@ function generate_selected_course(arr) {
 
     let htmlString = `
         <tr>
-            <td>必修</td>
+            <td class="compulsory">必修</td>
             <td>${compulsory_credit}</td>
-            <td>選修</td>
+            <td class="elective">選修</td>
             <td>${elective_credit}</td>
         </tr>
         <tr>
-            <td>總學分</td>
+            <td class="all_credit">總學分</td>
             <td>${compulsory_credit + elective_credit}</td>
         </tr>
     `
@@ -522,7 +522,12 @@ function make_tr_html_by_code_list(code_list) {
         let checked = COURSE.is_code_selected(code) ? "checked" : "";
         let color = ""; // 未設定，根據衝堂結果不同
         const time_string = one_code_dict["time_string"].replace(/\|/g, "|<br/>");
-        let type_color = (one_code_dict["selection"] == "必修") ? "type_red" : "type_green";
+        let selection_color_class = (one_code_dict["selection"] == "必修") ? "compulsory" : "elective";
+
+        let teacher = one_code_dict["teacher"];
+        if (teacher == "") {
+            teacher = "未排教師";
+        }
 
         // 使用模板字面值來生成 HTML 字串
         htmlString += `
@@ -530,8 +535,8 @@ function make_tr_html_by_code_list(code_list) {
             <td class='status'><input type='checkbox' ${checked}></td>
             <td class='code'><a href='https://selquery.ttu.edu.tw/Main/syllabusview.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a></td>
             <td class='name'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${one_code_dict["name"]}</a></td>
-            <td class='teacher'>${one_code_dict["teacher"]}</td>
-            <td class='selection ${type_color}'>${one_code_dict["selection"]}</td>
+            <td class='teacher'>${teacher}</td>
+            <td class='selection ${selection_color_class}'>${one_code_dict["selection"]}</td>
             <td class='credit'>${one_code_dict["credit"]}</td>
             <td class='hour'>${one_code_dict["hour"]}</td>
             <td class='time_string'>${time_string}</td>
@@ -551,26 +556,21 @@ function open_schedule() {
 
 // 複製課程代碼
 function copy_code() {
-    let checked_data = COURSE.get_checked_data();
-    let text = "";
+    let codes_text = "";
 
-    for (let data of checked_data) {
-        text += data.code + "\n";
+    for(const code of COURSE.code_list_selected) {
+        codes_text += code + "\n";
     }
 
-    // 取得要複製的文字
-    const textarea = document.getElementById('codes');
-    textarea.value = text;
-
-    // 選中 textarea 中的文字
-    textarea.select();
-    textarea.setSelectionRange(0, textarea.value.length);
-
-    // 執行複製動作
-    document.execCommand('copy'); // 宣告在這裡標示為已淘汰。
-
-    // 提示使用者已複製文字
-    alert('已複製文字到剪貼板');
+    navigator.clipboard.writeText(codes_text)
+    .then(() => {
+      console.log(`成功複製 ${codes_text} 到剪貼簿`);
+      // 在这里添加你的成功处理逻辑
+    })
+    .catch((error) => {
+      console.error("複製失敗", error);
+      // 在这里添加你的错误处理逻辑
+    });
 
 }
 
@@ -595,7 +595,7 @@ function json_upload(event) {
 
     // 將文件內容讀取為文本
     reader.readAsText(file);
-    
+
 }
 
 function json_download() {
@@ -645,11 +645,26 @@ document.getElementById('show-schedule').addEventListener('click', function () {
     const code_list = COURSE.code_list_selected;
     for (const code of code_list) {
         for (const time of COURSE.code_dict[code]["time"]) {
-            let htmlString = `<div class='${code}'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a><br><p>${COURSE.code_dict[code]["name"]}</p></div>`;
+            let htmlString = `<div class='${code}'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a><p>${COURSE.code_dict[code]["name"]}</p></div>`;
 
             document.getElementById(time).innerHTML += htmlString;
         }
     }
+
+    let compulsory_credit, elective_credit;
+    [compulsory_credit, elective_credit] = COURSE.get_credit();
+    table.innerHTML += `
+    <tr>
+        <td class="compulsory">必修</td>
+        <td>${compulsory_credit}</td>
+        <td class="elective">選修</td>
+        <td>${elective_credit}</td>
+    </tr>
+    <tr>
+        <td class="all_credit">總學分</td>
+        <td>${compulsory_credit + elective_credit}</td>
+    </tr>
+`
 });
 
 document.getElementById('close-schedule').addEventListener('click', function () {

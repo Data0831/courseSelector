@@ -3,8 +3,22 @@
     --bg-secondary: #2c2c2c;
     --text-primary: #e0e0e0;
     --text-secondary: #b0b0b0;
+    --text-third: rgb(237, 237, 237);
+
     --accent: #ff6b6b;
     --border: #444444;
+    --compulsory: orange;
+    --elective: rgb(255, 255, 86);
+    --conflict:rgba(255, 107, 107, 0.2);
+    --course-cell: #FFD699;
+    --course-cell-link: orange;
+}
+
+.light{
+   --bg-primary: #e0e0e0; 
+   /* course_sell:#e6f3ff; */
+   /* #45a049 */
+   /* #0066cc */
 }
 
 body {
@@ -27,80 +41,9 @@ select {
 }
 
 .container {
-    /* display: flex; */
     min-height: 100vh;
     padding: 20px;
 }
-
-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-#schedule-view {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 80%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    overflow: auto;
-}
-
-#schedule-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#schedule-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-height: 80%; /* 限制高度 */
-    overflow-y: auto; /* 允許垂直滾動 */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-#schedule-table-content {
-    display: flex;
-    flex-direction: row;
-}
-
-#close-schedule {
-    float: right;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-#schedule-view table {
-    font-size: 10px;
-    /* width: 100%; */
-    border-collapse: collapse;
-    border-spacing: 0 8px;
-    margin-top: 20px;
-    animation: fadeIn 0.5s ease-out;
-}
-
-#schedule-view td {
-    border: 1px solid #ddd;
-    /* padding: 8px; */
-    text-align: center;
-}
-
-#schedule-view tr:hover {
-    background-color: #ddd;
-}
-
 
 .site-title {
     color: var(--accent);
@@ -111,7 +54,7 @@ header {
 }
 
 .site-title:hover {
-    transform: scale(1.05);
+    transform: scale(0.95);
 }
 
 .site-title small {
@@ -156,7 +99,7 @@ main {
     padding: 0;
     text-align: center;
     line-height: 40px;
-    color: rgb(237, 237, 237);
+    color: var(--text-third);
     font-weight: bold;
     font-size: 14px;
     font-family: "LXGW WenKai Mono TC", monospace;
@@ -176,7 +119,7 @@ main {
 .btn:hover {
     background-color: var(--text-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(255, 107, 107, 0.2);
+    box-shadow: 0 4px 8px var(--conflict);
 }
 
 .content {
@@ -204,7 +147,7 @@ select {
 select:hover,
 select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+    box-shadow: 0 0 0 2px var(--conflict);
 }
 
 #course-table {
@@ -275,7 +218,7 @@ select:focus {
 
 #course-table th:nth-child(10) {
     width: 13%;
-}
+} 
 
 #course-table tr {
     background-color: var(--bg-primary);
@@ -319,12 +262,16 @@ select:focus {
     color: white;
 }
 
-#course-table .type_red{
-    color: red;
+#course-table .compulsory, .compulsory{
+    color: var(--compulsory);
 }
 
-#course-table .type_green{
-    color: green;
+#course-table .elective, .elective{
+    color: var(--elective);
+}
+
+#course-table .all_credit, .all_credit{
+    color: var(--text-secondary);
 }
 
 #course-table .time_string{
@@ -352,6 +299,49 @@ select:focus {
     }
 }
 
+/* 背景暗化 */
+#schedule-view {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+
+#schedule-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+#close-schedule {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#schedule-content {
+    background-color: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-height: 80%; /* 限制高度 */
+    overflow-y: auto; /* 允許垂直滾動 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+
 #schedule-content .header {
     display: flex;
     flex-direction: row;
@@ -365,45 +355,58 @@ select:focus {
     width: 10%;
 }
 
-
 /* 全局樣式 */
 #schedule-table-content {
+     flex-direction: row;
+    display: flex;
+    justify-content: center;
     line-height: 1.6;
-    color: #333;
-    background-color: #f4f4f4;
+    color: var(--text-third);
 }
 
 /* 表格樣式 */
 #schedule-table-content table {
-    width: 100%;
+    width: 80%;
     border-collapse: collapse;
     margin-bottom: 20px;
-    background-color: #fff;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    border-spacing: 0 8px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-out;
+    text-align: center;
+}
+
+#schedule-table-content tr:hover {
+    background-color: var(--text-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 #schedule-table-content th, #schedule-table-content td {
     padding: 12px;
     text-align: center;
     border: 1px solid #ddd;
+    background-color: var(--bg-primary);
 }
 
-#schedule-table-content thead {
-    background-color: #4a4a4a;
-    color: #fff;
+#schedule-table-content th{
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    font-size: 15px;
+    width: 15%;
 }
 
-/* 隔行變色 */
-#schedule-table-content tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+#schedule-table-content th:last-child {
+    width: 10%;
 }
 
 /* 課程格子樣式 */
 #schedule-table-content td div {
-    background-color: #e6f3ff;
+    background-color: var(--course-cell);
     border-radius: 4px;
-    padding: 8px;
-    margin: -8px;
+    padding: 2px;
+    margin: -5px;
+    color: var(--bg-primary);
+    font-size: 13px;
 }
 
 /* 課程連結樣式 */
@@ -415,12 +418,6 @@ select:focus {
 
 #schedule-table-content td a:hover {
     text-decoration: underline;
-}
-
-/* 課程名稱樣式 */
-#schedule-table-content td p {
-    margin: 5px 0 0;
-    font-size: 0.9em;
 }
 
 #schedule-table-content .btn:hover {
