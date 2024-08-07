@@ -9,7 +9,8 @@
     --border: #444444;
     --compulsory: orange;
     --elective: rgb(255, 255, 86);
-    --conflict:rgba(255, 107, 107, 0.2);
+    --is-conflict:rgba(255, 107, 107, 0.2);
+    --will-conflict:rgb(255, 255, 86, 0.2);
     --course-cell: #FFD699;
     --course-cell-link: orange;
 }
@@ -119,7 +120,7 @@ main {
 .btn:hover {
     background-color: var(--text-primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--conflict);
+    box-shadow: 0 4px 8px var(--is-conflict);
 }
 
 .content {
@@ -147,7 +148,7 @@ select {
 select:hover,
 select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px var(--conflict);
+    box-shadow: 0 0 0 2px var(--is-conflict);
 }
 
 #course-table {
@@ -260,6 +261,16 @@ select:focus {
 
 #course-table a{
     color: white;
+}
+
+#course-table .will_conflict_tr{
+    border: var(--accent) 1px solid;
+    box-shadow: 0 0 0 2px var(--will-conflict);
+}
+
+#course-table .is_conflict_tr{
+    border: var(--accent) 1px solid;
+    box-shadow: 0 0 0 2px var(--is-conflict);
 }
 
 #course-table .compulsory, .compulsory{

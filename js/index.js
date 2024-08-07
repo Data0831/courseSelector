@@ -36,7 +36,6 @@ class COURSE {
      */
     static add_course_to_code_list_selected(code) {
         console.log("使用者選擇了課程: " + code);
-
         // 已選擇的課程
         this.code_list_selected.push(code);
 
@@ -53,13 +52,13 @@ class COURSE {
     static rmv_course_from_code_list_selected(code) {
         console.log("使用者刪除了課程: " + code);
 
-        // 已選擇的課程
-        this.code_list_selected.pop(code);
-
         // 衝堂
         for (const time of this.code_dict[code]["time"]) {
             this.conflict_dict[time] -= 1;
         }
+
+        // 已選擇的課程
+        this.code_list_selected.splice(this.code_list_selected.indexOf(code), 1);
     }
 
     /**
@@ -433,7 +432,7 @@ function generate_other_select() { // id = SelDp
 // 生成完整課表 包含 tabs 和 list
 function generate_class_course(arr) {
     // arr[0] = dp_value, arr[1] = class_value
-    const class_dict = COURSE.get_cl_dict_by_dp_cl_value(arr[0], arr[1]);
+    const class_dict = COURSE.get_cl_dict_by_dp_cl_value(arr[0], arr[1]);;
     const code_list = class_dict["code_list"];
     generate_course_table(arr[1], code_list, generate_class_course, arr)
 }
@@ -442,13 +441,13 @@ function generate_teacher_course(arr) {
     // arr[0] = dp_value, arr[1] = teacher_value
     const class_dict = COURSE.get_ta_dict_by_dp_ta_value(arr[0], arr[1]);
     const code_list = class_dict["code_list"];
-    generate_course_table(arr[1], code_list, generate_class_course, arr)
+    generate_course_table(arr[1], code_list, generate_teacher_course, arr)
 }
 
 function generate_other_course(arr) {
     // arr[0] = type_value
     const code_list = COURSE.course_json["other"][arr[0]]["code_list"];
-    generate_course_table(COURSE.course_json["other"][arr[0]]["name"], code_list, generate_class_course, arr)
+    generate_course_table(COURSE.course_json["other"][arr[0]]["name"], code_list, generate_other_course, arr)
 }
 
 // 生成使用者選擇的課程列表
@@ -498,17 +497,16 @@ function generate_course_table(name, code_list, refresh, arr) {
     // 將 tr html 字串加入 table 內
     course_tbody.innerHTML += make_tr_html_by_code_list(code_list);
 
-    if (name === "使用者") {
-        // 使用委派方式來統一處理 checkbox 事件
-        console.log( course_tbody.querySelectorAll("input[type='checkbox']"));
-    }
     // 使用委派方式來統一處理 checkbox 事件
     course_tbody.querySelectorAll("input[type='checkbox']").forEach((checkbox, index) => {
         checkbox.addEventListener("change", function () {
-            COURSE.checkbox_change(code_list[index]);
+            let idx = index;
+            COURSE.checkbox_change(code_list[idx]);
             refresh(arr);
         });
     });
+
+ 
 
 }
 
@@ -525,7 +523,7 @@ function make_tr_html_by_code_list(code_list) {
     for (const code of code_list) {
         const one_code_dict = code_dict[code];
         let checked = COURSE.is_code_selected(code) ? "checked" : "";
-        let color = ""; // 未設定，根據衝堂結果不同
+
         const time_string = one_code_dict["time_string"].replace(/\|/g, "|<br/>");
         let selection_color_class = (one_code_dict["selection"] == "必修") ? "compulsory" : "elective";
 
@@ -534,9 +532,16 @@ function make_tr_html_by_code_list(code_list) {
             teacher = "未排教師";
         }
 
+        let conflict_class = "";
+        if (COURSE.is_conflict(code) === 1) {
+            conflict_class = "will_conflict_tr";
+        } else if (COURSE.is_conflict(code) === 2) {
+            conflict_class = "is_conflict_tr";
+        }
+
         // 使用模板字面值來生成 HTML 字串
         htmlString += `
-        <tr ${color} id='${code}_tr'>
+        <tr class='${conflict_class} id='${code}_tr'>
             <td class='status'><input type='checkbox' ${checked}></td>
             <td class='code'><a href='https://selquery.ttu.edu.tw/Main/syllabusview.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${code}</a></td>
             <td class='name'><a href='https://selquery.ttu.edu.tw/Main/SbjDetail.php?SbjNo=${code}' target='_blank' title='詳細資訊'>${one_code_dict["name"]}</a></td>
@@ -556,26 +561,25 @@ function make_tr_html_by_code_list(code_list) {
 function open_schedule() {
     let tableHTML = document.querySelector('#schedule-view table').innerHTML;
     localStorage.setItem('tableHTML', tableHTML);
-    console.log(tableHTML);
 }
 
 // 複製課程代碼
 function copy_code() {
     let codes_text = "";
 
-    for(const code of COURSE.code_list_selected) {
+    for (const code of COURSE.code_list_selected) {
         codes_text += code + "\n";
     }
 
     navigator.clipboard.writeText(codes_text)
-    .then(() => {
-      console.log(`成功複製 ${codes_text} 到剪貼簿`);
-      // 在这里添加你的成功处理逻辑
-    })
-    .catch((error) => {
-      console.error("複製失敗", error);
-      // 在这里添加你的错误处理逻辑
-    });
+        .then(() => {
+            console.log(`成功複製 ${codes_text} 到剪貼簿`);
+            // 在这里添加你的成功处理逻辑
+        })
+        .catch((error) => {
+            console.error("複製失敗", error);
+            // 在这里添加你的错误处理逻辑
+        });
 
 }
 
