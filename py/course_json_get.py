@@ -120,7 +120,7 @@ def get_select_value_name(url, select_name):
     Return:
         DICT: 裝載資料的字典 {"UI2B":"資訊工程學系二年B班" ...}
     """
-
+    
     DICT = {}
 
     web = requests.get(url)
