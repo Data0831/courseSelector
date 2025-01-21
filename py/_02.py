@@ -275,7 +275,7 @@ def get_data_from_response(key, is_class, response, url, class_code_list):
 # 初始化
 datas = None
 
-with open("./py/sel.json", "r", encoding="utf-8") as json_file:
+with open("./select.json", "r", encoding="utf-8") as json_file:
     datas = json.load(json_file)
 
 # 賦值
